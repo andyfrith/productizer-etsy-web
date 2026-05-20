@@ -18,10 +18,39 @@ Project mission, tech stack, and phased roadmap live in **[specs/](specs/index.h
 
 **Stack (summary):** Next.js, Tailwind, shadcn/ui, TanStack Query, TanStack AI, Zod, React Hook Form, Drizzle + Postgres, Vitest, Playwright, Framer Motion — **Docker Compose** for local services, polished UX throughout.
 
-### Local dev (when app scaffold exists)
+## Local development
+
+**Requirements:** Node 22, pnpm 9+, Docker Desktop (Postgres on port 5432).
 
 ```bash
 cp .env.example .env.local
 docker compose up -d
+pnpm install
+pnpm db:migrate
 pnpm dev
 ```
+
+Open [http://localhost:3000](http://localhost:3000) for the studio shell. DB health: [http://localhost:3000/api/health/db](http://localhost:3000/api/health/db).
+
+### Scripts
+
+| Script | Purpose |
+|--------|---------|
+| `pnpm dev` | Next.js dev server |
+| `pnpm build` | Production build |
+| `pnpm start` | Run production server |
+| `pnpm lint` | ESLint |
+| `pnpm test` | Vitest unit tests |
+| `pnpm test:e2e` | Playwright smoke tests |
+| `pnpm db:generate` | Generate Drizzle migrations |
+| `pnpm db:migrate` | Apply migrations |
+
+### Validation (P0)
+
+On branch `phase/0-scaffold`:
+
+```bash
+./scripts/validate-p0.sh
+```
+
+See [specs/20260519-phase0-scaffold/validation.html](specs/20260519-phase0-scaffold/validation.html).
