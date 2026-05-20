@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Validation — P4 AI Provider Spike</title>
+  <link rel="stylesheet" href="../shared.css" />
+  <style>
+    .checklist { list-style: none; margin-left: 0; padding: 0; }
+    .checklist li {
+      padding: 0.5rem 0.75rem;
+      margin-bottom: 0.35rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 0.9rem;
+    }
+    .checklist--agent li::before { content: "Auto · "; font-weight: 600; color: var(--accent); }
+    .checklist--manual li::before { content: "👤 "; color: var(--muted); }
+    .gate-ok {
+      border-left: 3px solid var(--idea);
+      background: rgba(61, 154, 106, 0.1);
+      padding: 1rem;
+      border-radius: 0 8px 8px 0;
+      margin: 1rem 0;
+    }
+  </style>
+</head>
+<body class="wide">
+  <nav class="breadcrumb">
+    <a href="../index.html">Constitution</a> /
+    <a href="index.html">P4 AI Provider Spike</a> / Validation
+  </nav>
+  <article>
+    <h1>Validation — P4 AI Provider Spike</h1>
+    <p class="lead">
+      <strong>Agents run automation first.</strong> Use <code>./scripts/validate-p4.sh</code>, <code>curl</code>, and Playwright generate specs.
+      CI uses <strong>mock provider</strong> (no <code>NANOBANANA_API_KEY</code>). Manual checks are minimal.
+    </p>
+
+    <div class="gate-ok">
+      <strong>PR-ready when:</strong> <code>./scripts/validate-p4.sh</code> exits 0, branch is <code>phase/4-ai-provider-spike</code>, agent pasted validation summary in PR.
+      Skills: <code>productizer-phase-validate</code>, <code>productizer-p4-ai-provider-spike</code>.
+    </div>
+
+    <section>
+      <h2>1. Agent — run validation script</h2>
+      <pre><code>chmod +x scripts/validate-p4.sh scripts/validate-lib.sh
+
+# Spec + docs only (planning PR or before implementation)
+./scripts/validate-p4.sh --tier docs
+
+# Full P4 (after implementation)
+./scripts/validate-p4.sh</code></pre>
+    </section>
+
+    <section>
+      <h2>2. Agent — what the script verifies</h2>
+      <table>
+        <thead><tr><th>Area</th><th>Automated how</th></tr></thead>
+        <tbody>
+          <tr><td>Git branch</td><td><code>phase/4-ai-provider-spike</code></td></tr>
+          <tr><td>Secrets</td><td>Diff vs <code>master</code> — no <code>.env.local</code>, keys</td></tr>
+          <tr><td>Spec files</td><td><code>specs/20260520-phase4-ai-provider-spike/</code> index, requirements, plan, validation</td></tr>
+          <tr><td>P0–P3 regression</td><td>Postgres healthy; concepts + variation approve curl smoke</td></tr>
+          <tr><td>AI providers (full tier)</td><td><code>src/lib/ai/providers/mock.ts</code>, <code>nanobanana.ts</code>, generate route</td></tr>
+          <tr><td>Gate (full tier)</td><td><code>pnpm db:migrate lint test build test:e2e</code></td></tr>
+          <tr><td>Generate smoke (full tier)</td><td><code>curl</code> POST generate (mock) → stream contains <code>done</code> → GET variations length increased</td></tr>
+          <tr><td>Generate UX</td><td><strong>Playwright</strong> <code>e2e/variation-generate.spec.ts</code></td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>3. Agent — curl reference (debug)</h2>
+      <pre><code># Ensure mock provider (no live key in CI)
+# AI_PROVIDER=mock in .env.local or unset NANOBANANA_API_KEY
+
+CONCEPT_ID=$(curl -sf -X POST http://localhost:3000/api/concepts \
+  -H 'Content-Type: application/json' \
+  -d '{"name":"validate-p4","campaignLabel":"validate"}' | jq -r .id)
+
+# Stream generate (first lines)
+curl -sf -N -X POST "http://localhost:3000/api/concepts/$CONCEPT_ID/variations/generate" \
+  -H 'Content-Type: application/json' \
+  -d '{"prompt":"sunset forest poster","count":2}' | head -20
+
+# List variations — expect 2+ pending with prompt_snapshot
+curl -sf "http://localhost:3000/api/concepts/$CONCEPT_ID/variations" | jq 'length, .[0].promptSnapshot'</code></pre>
+    </section>
+
+    <section>
+      <h2>4. Playwright — generate automation (required, full tier)</h2>
+      <p style="font-size:0.9rem;color:var(--muted)">File: <code>e2e/variation-generate.spec.ts</code> (runs with mock provider)</p>
+      <ul class="checklist checklist--agent">
+        <li>Create concept; open <code>/concepts/:id</code></li>
+        <li><code>variation-generate-submit</code> visible; enter prompt; count = 2</li>
+        <li><code>variation-generate-status</code> shows progress then completion</li>
+        <li><code>variation-gallery</code> shows 2 new pending cards</li>
+        <li>Optional: approve one generated variation (reuses P3 flow)</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>5. Manual (≤ 3)</h2>
+      <ul class="checklist checklist--manual">
+        <li>With real <code>NANOBANANA_API_KEY</code>, one live generate returns plausible images (optional pre-merge)</li>
+        <li>GitHub PR merge approval</li>
+        <li>Docker/ports blocked on agent machine only</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>6. PR checklist (agent pastes)</h2>
+      <pre><code>## Validation
+- [ ] Branch: phase/4-ai-provider-spike
+- [ ] ./scripts/validate-p4.sh — PASS (paste summary)
+- [ ] Mock provider E2E: variation-generate.spec.ts
+- [ ] P3 regression: variation-lineage.spec.ts still green</code></pre>
+    </section>
+  </article>
+</body>
+</html>

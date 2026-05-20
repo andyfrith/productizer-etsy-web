@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Requirements — P4 AI Provider Spike</title>
+  <link rel="stylesheet" href="../shared.css" />
+</head>
+<body class="wide">
+  <nav class="breadcrumb">
+    <a href="../index.html">Constitution</a> /
+    <a href="index.html">P4 AI Provider Spike</a> / Requirements
+  </nav>
+  <article>
+    <h1>Requirements — P4 AI Provider Spike</h1>
+    <p class="lead">AI-assisted 1→N variation generation with provider abstraction and streaming status. Satisfies roadmap phase 4 and unblocks P5 poster mock.</p>
+
+    <div class="decided">
+      <span class="label">Locked decisions</span>
+      <ul style="margin:0.5rem 0 0 1.25rem">
+        <li>Phase: <strong>P4</strong> — full roadmap AI provider spike scope</li>
+        <li>API: <strong>REST</strong> — <code>POST /api/concepts/:id/variations/generate</code> (streaming response)</li>
+        <li>Runtime: <strong>pnpm</strong>, <strong>Node 22 LTS</strong></li>
+        <li>Validation bar: <strong>automated script + curl + Playwright generate E2E</strong> (mock provider when no API key)</li>
+        <li>Spec folder: <code>specs/20260520-phase4-ai-provider-spike/</code></li>
+        <li>Git branch: <code>phase/4-ai-provider-spike</code> → merge via PR to <code>master</code></li>
+      </ul>
+    </div>
+
+    <section>
+      <h2>Goal</h2>
+      <p>
+        On a concept detail page, a user enters a <strong>prompt</strong> and requests <strong>1–N AI variations</strong>.
+        The server calls a pluggable <code>ImageGenerationProvider</code> (Nano Banana when configured, otherwise a <strong>mock</strong> provider for dev/CI),
+        persists each result as a <code>concept_variation</code> (pending status) with <code>prompt_snapshot</code>,
+        and streams <strong>job progress</strong> to the client via TanStack AI. The variation gallery refreshes when generation completes.
+      </p>
+    </section>
+
+    <section>
+      <h2>Prerequisites (P3 merged)</h2>
+      <ul>
+        <li><code>concept_variations</code> + variation REST + <code>VariationGallery</code> approve/reject (P3)</li>
+        <li><code>prompt_snapshot</code> column exists (nullable; populated in P4)</li>
+        <li>P0 stub: <code>src/lib/ai/types.ts</code>, <code>registry.ts</code>, <code>@tanstack/ai</code> in <code>package.json</code></li>
+        <li>P3 validation: <code>./scripts/validate-p3.sh</code> passes on <code>master</code></li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Requirements (MUST)</h2>
+      <table>
+        <thead><tr><th>ID</th><th>Requirement</th><th>Acceptance</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><code>R4.1</code></td>
+            <td>Provider types</td>
+            <td>Extend <code>GenerateImageInput</code>: <code>prompt</code>, optional <code>referenceImagePath</code> or buffer from <code>sourceAssetId</code>, <code>width</code>/<code>height</code>; <code>GenerateImageResult</code> returns image bytes or temp path before persistence</td>
+          </tr>
+          <tr>
+            <td><code>R4.2</code></td>
+            <td>Nano Banana provider</td>
+            <td><code>src/lib/ai/providers/nanobanana.ts</code> implements <code>ImageGenerationProvider</code>; reads <code>NANOBANANA_API_KEY</code>; calls vendor HTTP API (document endpoint in code comment); throws clear error when key missing and mock not forced</td>
+          </tr>
+          <tr>
+            <td><code>R4.3</code></td>
+            <td>Mock provider for CI</td>
+            <td><code>src/lib/ai/providers/mock.ts</code> copies <code>e2e/fixtures/sample.png</code> (or solid-color sharp buffer) per variation; used when <code>NANOBANANA_API_KEY</code> empty or <code>AI_PROVIDER=mock</code></td>
+          </tr>
+          <tr>
+            <td><code>R4.4</code></td>
+            <td>Provider registry</td>
+            <td><code>getImageProvider(id?)</code> resolves <code>AI_PROVIDER</code> from env (<code>nanobanana</code> | <code>mock</code>); auto-fallback to mock when key absent; Vitest covers resolution</td>
+          </tr>
+          <tr>
+            <td><code>R4.5</code></td>
+            <td>Generate request schema</td>
+            <td>Zod: <code>prompt</code> (min 3, max 2000), <code>count</code> (int 1–4, default 1), optional <code>parentVariationId</code>, optional <code>sourceAssetId</code>, optional <code>providerId</code></td>
+          </tr>
+          <tr>
+            <td><code>R4.6</code></td>
+            <td>Generate REST route</td>
+            <td><code>POST /api/concepts/:id/variations/generate</code> validates body + concept exists; 404 if concept missing; 400 on invalid asset/parent refs</td>
+          </tr>
+          <tr>
+            <td><code>R4.7</code></td>
+            <td>Persist generated variations</td>
+            <td>For each of <code>count</code> images: create variation via existing repository (sharp renditions, storage keys); <code>status=pending</code>; set <code>prompt_snapshot</code> to submitted prompt; optional <code>parent_variation_id</code> / <code>source_asset_id</code></td>
+          </tr>
+          <tr>
+            <td><code>R4.8</code></td>
+            <td>Streaming progress events</td>
+            <td>Route returns <code>text/event-stream</code> (or NDJSON) events: <code>queued</code>, <code>generating</code> (index, total), <code>saved</code> (variationId), <code>done</code> (variationIds[]), <code>error</code> (message). Client parses with TanStack AI or fetch reader</td>
+          </tr>
+          <tr>
+            <td><code>R4.9</code></td>
+            <td><code>useGenerateVariations</code></td>
+            <td><code>src/hooks/use-generate-variations.ts</code> — exposes <code>generate</code>, <code>status</code>, <code>progress</code>, <code>error</code>; on <code>done</code> invalidates <code>['variations', conceptId]</code> and concept detail</td>
+          </tr>
+          <tr>
+            <td><code>R4.10</code></td>
+            <td>Generate UI panel</td>
+            <td>On concept detail above gallery: prompt textarea, count select (1–4), Generate button <code>data-testid="variation-generate-submit"</code>; progress text <code>data-testid="variation-generate-status"</code>; disabled while in-flight; Sonner on error</td>
+          </tr>
+          <tr>
+            <td><code>R4.11</code></td>
+            <td>Reference image for generate</td>
+            <td>When concept has <code>previewAssetId</code>, optional “Use preview as reference” sends <code>sourceAssetId</code>; provider receives reference image bytes when supported</td>
+          </tr>
+          <tr>
+            <td><code>R4.12</code></td>
+            <td>Unit tests</td>
+            <td>Vitest: generate Zod schema; registry mock fallback; optional nanobanana request builder (mocked fetch)</td>
+          </tr>
+          <tr>
+            <td><code>R4.13</code></td>
+            <td>E2E generate flow</td>
+            <td>Playwright <code>e2e/variation-generate.spec.ts</code>: with mock provider, submit prompt count=2, wait for status done, assert 2 new pending cards in <code>variation-gallery</code></td>
+          </tr>
+          <tr>
+            <td><code>R4.14</code></td>
+            <td>Validation script</td>
+            <td><code>./scripts/validate-p4.sh</code> with <code>--tier docs</code> before implementation; full tier before PR</td>
+          </tr>
+          <tr>
+            <td><code>R4.15</code></td>
+            <td>Env documentation</td>
+            <td><code>.env.example</code> documents <code>AI_PROVIDER</code>, <code>NANOBANANA_API_KEY</code>; README section “AI generation (P4)”</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>Requirements (SHOULD)</h2>
+      <table>
+        <thead><tr><th>ID</th><th>Requirement</th><th>Acceptance</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><code>R4.S1</code></td>
+            <td>Provider badge in UI</td>
+            <td>Generate panel shows active provider id (<code>mock</code> vs <code>nanobanana</code>) in muted text</td>
+          </tr>
+          <tr>
+            <td><code>R4.S2</code></td>
+            <td>Cancel in-flight</td>
+            <td>AbortController on client fetch; server stops after current image (best-effort)</td>
+          </tr>
+          <tr>
+            <td><code>R4.S3</code></td>
+            <td>Nano Banana Pro tier</td>
+            <td><code>NANOBANANA_TIER=pro</code> env switches model id in provider (no UI required in P4)</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>Out of scope</h2>
+      <ul>
+        <li>Poster / product mock compositing (P5)</li>
+        <li>Studio dashboard hero + MiniMock home (P6)</li>
+        <li>Persistent <code>generation_jobs</code> table + Redis/BullMQ queue (defer; in-process stream suffices for P4 spike)</li>
+        <li>Auto-approve AI variations (user still approves in gallery)</li>
+        <li>Auth, billing, rate limits per user</li>
+        <li>Additional providers beyond Nano Banana + mock (registry extensible only)</li>
+        <li>Etsy, niche research</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Proposed repo layout</h2>
+      <pre><code>src/lib/ai/
+  types.ts                          # extend input/result
+  registry.ts                       # nanobanana + mock
+  providers/nanobanana.ts
+  providers/mock.ts
+  generate-variations.ts            # orchestration: provider loop + repository persist
+src/lib/schemas/generate-variation.ts
+src/app/api/concepts/[id]/variations/generate/route.ts
+src/hooks/use-generate-variations.ts
+src/components/variations/generate-variations-panel.tsx
+e2e/variation-generate.spec.ts
+tests/ai-registry.test.ts
+tests/generate-variation-schema.test.ts
+scripts/validate-p4.sh</code></pre>
+    </section>
+
+    <section id="phase-amendments">
+      <h2>Phase amendments</h2>
+      <p style="font-size:0.9rem;color:var(--muted)">In-phase drop-ins after kickoff. Empty at planning time.</p>
+      <table>
+        <thead><tr><th>Date</th><th>Change</th><th>IDs affected</th></tr></thead>
+        <tbody>
+          <tr><td colspan="3" style="color:var(--muted)">— none —</td></tr>
+        </tbody>
+      </table>
+    </section>
+  </article>
+</body>
+</html>
