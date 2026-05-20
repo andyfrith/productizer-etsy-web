@@ -29,6 +29,8 @@ Before creating spec files, ensure branch `phase/{N}-{slug}` exists and is check
 
 ## Workflow
 
+Prefer **`productizer-begin-next-phase-planning`** when starting a **new** phase from the roadmap (or use command `/begin-next-phase-planning`).
+
 1. Read `specs/roadmap.html` for phase number, deliverable, and dependencies.
 2. Read `specs/tech-stack.html` and `specs/mission.html` for constraints.
 3. Use **AskQuestion** to confirm: phase ID, scope (full vs partial), Node/pnpm versions, validation bar, folder name.

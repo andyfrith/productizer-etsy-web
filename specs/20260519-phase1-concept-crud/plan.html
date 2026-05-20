@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Plan — P1 Concept CRUD</title>
+  <link rel="stylesheet" href="../shared.css" />
+</head>
+<body class="wide">
+  <nav class="breadcrumb">
+    <a href="../index.html">Constitution</a> /
+    <a href="index.html">P1 Concept CRUD</a> / Plan
+  </nav>
+  <article>
+    <h1>Implementation Plan — P1 Concept CRUD</h1>
+    <p class="lead">Ordered steps to implement requirements R1.1–R1.12. Each step should leave the repo in a runnable state.</p>
+
+    <div class="focus-now">
+      <strong>Branch:</strong> <code>phase/1-concept-crud</code> (off <code>master</code>) · merge via PR only · <a href="../git-workflow.html" style="color:var(--accent)">Git workflow</a>
+    </div>
+
+    <div class="focus-now">
+      <strong>Agent skills:</strong> <code>productizer-p1-concept-crud</code> + <code>productizer-git-workflow</code> + <code>productizer-phase-validate</code>
+    </div>
+
+    <section>
+      <h2>Step 0 — Branch from master</h2>
+      <pre><code>git fetch origin
+git checkout master && git pull origin master
+git checkout phase/1-concept-crud 2>/dev/null || git checkout -b phase/1-concept-crud
+git branch --show-current   # must print: phase/1-concept-crud</code></pre>
+    </section>
+
+    <section>
+      <h2>Step 1 — Drizzle schema &amp; migration</h2>
+      <ol>
+        <li>Add <code>designConcepts</code> to <code>src/lib/db/schema.ts</code> per requirements R1.1 (uuid PK, timestamps with timezone).</li>
+        <li>Extend <code>conceptFormSchema</code> only if needed; keep status server-controlled on create (default <code>draft</code>).</li>
+        <li><code>pnpm db:generate && pnpm db:migrate</code></li>
+        <li>Optional: seed script or dev-only POST for local testing (not required for validation).</li>
+      </ol>
+    </section>
+
+    <section>
+      <h2>Step 2 — Repository / service layer</h2>
+      <ol>
+        <li><code>src/lib/concepts/repository.ts</code> — <code>listConcepts</code>, <code>getConceptById</code>, <code>createConcept</code>, <code>updateConcept</code>, <code>archiveConcept</code></li>
+        <li>Use Drizzle client from <code>src/lib/db/index.ts</code>; map rows to API DTO (camelCase JSON).</li>
+        <li>Unit-test repository or Zod parsing in isolation.</li>
+      </ol>
+    </section>
+
+    <section>
+      <h2>Step 3 — REST API routes</h2>
+      <ol>
+        <li><code>src/app/api/concepts/route.ts</code> — GET (list), POST (create)</li>
+        <li><code>src/app/api/concepts/[id]/route.ts</code> — GET, PATCH, DELETE (archive)</li>
+        <li>Parse JSON with Zod; return consistent error shape <code>{ error: string }</code></li>
+        <li>Verify with curl (see <a href="validation.html" style="color:var(--accent)">validation.html</a>)</li>
+      </ol>
+    </section>
+
+    <section>
+      <h2>Step 4 — TanStack Query hooks</h2>
+      <ol>
+        <li><code>src/hooks/use-concepts.ts</code> — query keys <code>['concepts']</code>, <code>['concepts', id]</code></li>
+        <li>Mutations: <code>useCreateConcept</code>, <code>useUpdateConcept</code>, <code>useArchiveConcept</code></li>
+        <li>Invalidate list/detail on success; toast via Sonner</li>
+      </ol>
+    </section>
+
+    <section>
+      <h2>Step 5 — shadcn form components</h2>
+      <ol>
+        <li>Add shadcn: <code>input</code>, <code>textarea</code>, <code>label</code>, <code>badge</code>, <code>dialog</code>, <code>alert-dialog</code></li>
+        <li><code>src/components/concepts/concept-form.tsx</code> — controlled fields for name, description, campaignLabel, styleNotes</li>
+        <li><code>concept-card.tsx</code> — Card summary for gallery grid</li>
+      </ol>
+    </section>
+
+    <section>
+      <h2>Step 6 — Studio pages</h2>
+      <ol>
+        <li><code>src/app/(studio)/concepts/page.tsx</code> — gallery + empty state + link to new</li>
+        <li><code>src/app/(studio)/concepts/new/page.tsx</code> — create form</li>
+        <li><code>src/app/(studio)/concepts/[id]/page.tsx</code> — detail + edit + archive</li>
+        <li>Update <code>(studio)/page.tsx</code> — P1 badge, active nav to concepts</li>
+      </ol>
+    </section>
+
+    <section>
+      <h2>Step 7 — Motion &amp; polish</h2>
+      <ol>
+        <li>Staggered card entrance on gallery (Framer Motion)</li>
+        <li>Skeleton grid while <code>useConcepts</code> is pending</li>
+        <li>Status badges: draft / active / archived color tokens</li>
+      </ol>
+    </section>
+
+    <section>
+      <h2>Step 8 — Tests</h2>
+      <ol>
+        <li>Vitest: <code>tests/concept-schema.test.ts</code> — valid/invalid payloads</li>
+        <li>Vitest or integration: API route tests with mocked DB if needed</li>
+        <li>Playwright: <code>e2e/concepts-crud.spec.ts</code> — full create → edit → archive flow</li>
+        <li>Add <code>data-testid</code> attributes per validation.html</li>
+      </ol>
+    </section>
+
+    <section>
+      <h2>Step 9 — Validation script &amp; docs</h2>
+      <ol>
+        <li>Ensure <code>scripts/validate-p1.sh</code> passes on branch</li>
+        <li>README: concept routes, API summary, migrate step</li>
+        <li>Run <code>./scripts/validate-p1.sh</code> before PR; paste output in PR body</li>
+      </ol>
+    </section>
+
+    <section>
+      <h2>API contract (reference)</h2>
+      <pre><code>// POST /api/concepts
+{ "name": "Sunset botanical", "description": "...", "campaignLabel": "cottagecore", "styleNotes": "..." }
+→ 201 { "id": "...", "name": "...", "status": "draft", ... }
+
+// GET /api/concepts
+→ 200 [{ "id": "...", "name": "...", "status": "draft", ... }]
+
+// PATCH /api/concepts/:id
+{ "name": "Updated name" }
+→ 200 { ... }
+
+// DELETE /api/concepts/:id  (archive)
+→ 200 { ..., "status": "archived" }</code></pre>
+    </section>
+
+    <section>
+      <h2>Risks &amp; mitigations</h2>
+      <table>
+        <thead><tr><th>Risk</th><th>Mitigation</th></tr></thead>
+        <tbody>
+          <tr><td>E2E flaky on timing</td><td>Use <code>data-testid</code> + <code>expect.poll</code> or wait for network idle</td></tr>
+          <tr><td>UUID route param validation</td><td>Zod <code>z.string().uuid()</code> in route handler; 404 on invalid id</td></tr>
+          <tr><td>Query cache stale after mutate</td><td>Explicit <code>invalidateQueries</code> on success</td></tr>
+          <tr><td>P0 regression</td><td>validate-p1.sh includes health check + home smoke</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>Definition of done</h2>
+      <p>All items in <a href="validation.html" style="color:var(--accent)">validation.html</a> — <code>./scripts/validate-p1.sh</code> exit 0, Playwright CRUD green, PR checklist complete.</p>
+    </section>
+
+    <p style="margin-top:2rem;font-size:0.85rem">
+      <a href="requirements.html" style="color:var(--accent)">← Requirements</a> ·
+      <a href="validation.html" style="color:var(--accent)">→ Validation</a>
+    </p>
+  </article>
+</body>
+</html>

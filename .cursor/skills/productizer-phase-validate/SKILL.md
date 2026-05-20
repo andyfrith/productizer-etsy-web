@@ -63,6 +63,20 @@ chmod +x scripts/validate-p0.sh scripts/validate-lib.sh
 2. In `validation.html`: list script command first; mark only irreducible items `MANUAL`
 3. Encode UX in Playwright, not manual checklist
 
+## P1 commands
+
+```bash
+chmod +x scripts/validate-p1.sh scripts/validate-lib.sh
+
+# Spec/docs only
+./scripts/validate-p1.sh --tier docs
+
+# Full P1 (after implementation)
+./scripts/validate-p1.sh
+```
+
+Spec: `specs/20260519-phase1-concept-crud/validation.html`
+
 ## Playwright UX coverage (P0)
 
 E2E specs should assert (so humans don't):
@@ -72,3 +86,10 @@ E2E specs should assert (so humans don't):
 - DB status visible (connected or error state)
 - Skeleton appears while loading (or data-testid present)
 - Focusable primary control exists
+
+## Playwright CRUD coverage (P1)
+
+`e2e/concepts-crud.spec.ts` should assert:
+
+- Gallery at `/concepts` with `data-testid="concept-gallery"`
+- Create → list shows name → edit name → archive → hidden from default list
