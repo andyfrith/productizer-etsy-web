@@ -10,6 +10,7 @@ export interface ConceptDto {
   styleNotes: string | null;
   status: ConceptStatus;
   previewAssetId: string | null;
+  approvedVariationId: string | null;
   createdAt: string;
   updatedAt: string;
 }
