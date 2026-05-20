@@ -38,7 +38,8 @@ git checkout phase/N-slug      # existing
 | Phase | Branch | Spec folder |
 |-------|--------|-------------|
 | P0 Scaffold | `phase/0-scaffold` | `specs/20260519-phase0-scaffold/` |
-| P1 Concept CRUD | `phase/1-concept-crud` | (create when specced) |
+| P1 Concept CRUD | `phase/1-concept-crud` | `specs/20260519-phase1-concept-crud/` |
+| P2 Asset Upload | `phase/2-asset-upload` | `specs/20260520-phase2-asset-upload/` |
 
 ## Commits
 

@@ -77,6 +77,20 @@ chmod +x scripts/validate-p1.sh scripts/validate-lib.sh
 
 Spec: `specs/20260519-phase1-concept-crud/validation.html`
 
+## P2 commands
+
+```bash
+chmod +x scripts/validate-p2.sh scripts/validate-lib.sh
+
+# Spec/docs only
+./scripts/validate-p2.sh --tier docs
+
+# Full P2 (after implementation)
+./scripts/validate-p2.sh
+```
+
+Spec: `specs/20260520-phase2-asset-upload/validation.html`
+
 ## Playwright UX coverage (P0)
 
 E2E specs should assert (so humans don't):

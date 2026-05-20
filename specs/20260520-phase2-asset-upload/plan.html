@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Plan — P2 Asset Upload</title>
+  <link rel="stylesheet" href="../shared.css" />
+</head>
+<body class="wide">
+  <nav class="breadcrumb">
+    <a href="../index.html">Constitution</a> /
+    <a href="index.html">P2 Asset Upload</a> / Plan
+  </nav>
+  <article>
+    <h1>Implementation Plan — P2 Asset Upload</h1>
+    <p class="lead">Ordered steps to implement requirements R2.1–R2.12. Each step should leave the repo in a runnable state.</p>
+
+    <div class="focus-now">
+      <strong>Branch:</strong> <code>phase/2-asset-upload</code> (off <code>master</code>) · merge via PR only · <a href="../git-workflow.html" style="color:var(--link)">Git workflow</a>
+    </div>
+
+    <div class="focus-now">
+      <strong>Agent skills:</strong> <code>productizer-p2-asset-upload</code> + <code>productizer-git-workflow</code> + <code>productizer-phase-validate</code>
+    </div>
+
+    <section>
+      <h2>Step 0 — Branch from master</h2>
+      <pre><code>git fetch origin
+git checkout master && git pull origin master
+git checkout phase/2-asset-upload 2>/dev/null || git checkout -b phase/2-asset-upload
+git branch --show-current   # must print: phase/2-asset-upload</code></pre>
+      <p style="font-size:0.9rem;color:var(--muted)">Include <code>pnpm db:studio</code> in <code>package.json</code> if not yet on branch (dev tooling).</p>
+    </section>
+
+    <section>
+      <h2>Step 1 — Dependencies &amp; schema</h2>
+      <ol>
+        <li><code>pnpm add sharp</code> (image processing; use default install for platform)</li>
+        <li>Add <code>designAssets</code> table and <code>referenceAssetId</code> on <code>designConcepts</code> per R2.1–R2.2</li>
+        <li><code>pnpm db:generate && pnpm db:migrate</code></li>
+      </ol>
+    </section>
+
+    <section>
+      <h2>Step 2 — Storage &amp; processing layer</h2>
+      <ol>
+        <li><code>src/lib/assets/storage-paths.ts</code> — safe keys under <code>assets/{id}/</code></li>
+        <li><code>src/lib/assets/process-image.ts</code> — generate thumb, card, full buffers via sharp</li>
+        <li><code>src/lib/assets/repository.ts</code> — insert asset row, link concept reference</li>
+        <li>Extend <code>src/lib/concepts/repository.ts</code> to return <code>referenceAssetId</code> and join metadata if needed</li>
+      </ol>
+    </section>
+
+    <section>
+      <h2>Step 3 — Validation schema</h2>
+      <ol>
+        <li><code>src/lib/schemas/asset.ts</code> — allowed MIME types, max bytes, variant enum</li>
+        <li>Vitest tests for schema and path helpers</li>
+      </ol>
+    </section>
+
+    <section>
+      <h2>Step 4 — REST API routes</h2>
+      <ol>
+        <li><code>src/app/api/assets/route.ts</code> — POST multipart (parse with <code>request.formData()</code>)</li>
+        <li><code>src/app/api/assets/[id]/route.ts</code> — GET metadata</li>
+        <li><code>src/app/api/assets/[id]/file/route.ts</code> — GET file stream by <code>variant</code> query</li>
+        <li>Consistent JSON errors <code>{ error: string }</code></li>
+        <li>Verify with curl (see <a href="validation.html" style="color:var(--link)">validation.html</a>)</li>
+      </ol>
+    </section>
+
+    <section>
+      <h2>Step 5 — Client hook &amp; component</h2>
+      <ol>
+        <li><code>src/hooks/use-upload-asset.ts</code> — FormData mutation + cache invalidation</li>
+        <li><code>src/components/assets/asset-upload.tsx</code> — file input, preview <code>&lt;img src=.../file?variant=card&gt;</code></li>
+        <li>Wire into <code>src/app/(studio)/concepts/[id]/page.tsx</code></li>
+      </ol>
+    </section>
+
+    <section>
+      <h2>Step 6 — Studio polish</h2>
+      <ol>
+        <li>Update studio home badge to P2 where appropriate</li>
+        <li>Optional: thumb on <code>concept-card.tsx</code> (R2.S2)</li>
+        <li>README: document upload flow and <code>pnpm db:studio</code></li>
+      </ol>
+    </section>
+
+    <section>
+      <h2>Step 7 — Tests &amp; validation script</h2>
+      <ol>
+        <li><code>e2e/fixtures/sample.png</code> — tiny PNG for Playwright</li>
+        <li><code>e2e/asset-upload.spec.ts</code> — upload flow with <code>data-testid</code></li>
+        <li>Finalize <code>scripts/validate-p2.sh</code> curl upload smoke</li>
+        <li><code>./scripts/validate-p2.sh</code> exit 0 before PR</li>
+      </ol>
+    </section>
+
+    <section>
+      <h2>Package.json scripts (target)</h2>
+      <pre><code>{
+  "scripts": {
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:studio": "drizzle-kit studio"
+  }
+}</code></pre>
+    </section>
+
+    <section>
+      <h2>Risks &amp; mitigations</h2>
+      <table>
+        <thead><tr><th>Risk</th><th>Mitigation</th></tr></thead>
+        <tbody>
+          <tr><td><code>sharp</code> native binary on CI</td><td>Use supported Node 22; pin sharp version; document if Alpine musl issues</td></tr>
+          <tr><td>Large uploads memory pressure</td><td>Enforce max size in API; stream to disk where possible</td></tr>
+          <tr><td>Multipart parsing in App Router</td><td>Use <code>formData()</code>; test with curl <code>-F file=@...</code></td></tr>
+          <tr><td>Orphan asset rows on re-upload</td><td>Accept for P2 or delete previous files in same transaction</td></tr>
+        </tbody>
+      </table>
+    </section>
+  </article>
+</body>
+</html>

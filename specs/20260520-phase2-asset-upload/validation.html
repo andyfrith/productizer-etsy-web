@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Validation — P2 Asset Upload</title>
+  <link rel="stylesheet" href="../shared.css" />
+  <style>
+    .checklist { list-style: none; margin-left: 0; padding: 0; }
+    .checklist li {
+      padding: 0.5rem 0.75rem;
+      margin-bottom: 0.35rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 0.9rem;
+    }
+    .checklist--agent li::before { content: "Auto · "; font-weight: 600; color: var(--accent); }
+    .checklist--manual li::before { content: "👤 "; color: var(--muted); }
+    .gate-ok {
+      border-left: 3px solid var(--idea);
+      background: rgba(61, 154, 106, 0.1);
+      padding: 1rem;
+      border-radius: 0 8px 8px 0;
+      margin: 1rem 0;
+    }
+  </style>
+</head>
+<body class="wide">
+  <nav class="breadcrumb">
+    <a href="../index.html">Constitution</a> /
+    <a href="index.html">P2 Asset Upload</a> / Validation
+  </nav>
+  <article>
+    <h1>Validation — P2 Asset Upload</h1>
+    <p class="lead">
+      <strong>Agents run automation first.</strong> Use <code>./scripts/validate-p2.sh</code>, <code>curl</code>, and Playwright upload specs. Manual user checks are minimal (merge approval, environment blockers only).
+    </p>
+
+    <div class="gate-ok">
+      <strong>PR-ready when:</strong> <code>./scripts/validate-p2.sh</code> exits 0, branch is <code>phase/2-asset-upload</code>, agent pasted validation summary in PR. Skills: <code>productizer-phase-validate</code>, <code>productizer-p2-asset-upload</code>.
+    </div>
+
+    <section>
+      <h2>1. Agent — run validation script</h2>
+      <pre><code>chmod +x scripts/validate-p2.sh scripts/validate-lib.sh
+
+# Spec + docs only (before implementation)
+./scripts/validate-p2.sh --tier docs
+
+# Full P2 (after implementation)
+./scripts/validate-p2.sh</code></pre>
+    </section>
+
+    <section>
+      <h2>2. Agent — what the script verifies</h2>
+      <table>
+        <thead><tr><th>Area</th><th>Automated how</th></tr></thead>
+        <tbody>
+          <tr><td>Git branch</td><td><code>phase/2-asset-upload</code></td></tr>
+          <tr><td>Secrets</td><td>Diff vs <code>master</code> — no <code>.env.local</code>, keys</td></tr>
+          <tr><td>Spec files</td><td><code>specs/20260520-phase2-asset-upload/</code> index, requirements, plan, validation</td></tr>
+          <tr><td>P0/P1 regression</td><td>Postgres healthy; <code>/api/health/db</code>; <code>/concepts</code> 200; concept REST smoke</td></tr>
+          <tr><td>Schema</td><td><code>design_assets</code> + <code>reference_asset_id</code> in schema + migration</td></tr>
+          <tr><td>API routes</td><td><code>src/app/api/assets/</code> route files</td></tr>
+          <tr><td>db:studio</td><td><code>package.json</code> script <code>db:studio</code></td></tr>
+          <tr><td>Gate</td><td><code>pnpm db:migrate lint test build test:e2e</code></td></tr>
+          <tr><td>Upload smoke</td><td><code>curl -F</code> POST asset → GET metadata → GET file variant 200</td></tr>
+          <tr><td>Upload UX</td><td><strong>Playwright</strong> <code>e2e/asset-upload.spec.ts</code></td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>3. Agent — curl reference (debug)</h2>
+      <pre><code># Upload (replace CONCEPT_ID and path to image)
+curl -s -X POST http://localhost:3000/api/assets \
+  -F "file=@e2e/fixtures/sample.png" \
+  -F "conceptId=CONCEPT_ID" | jq .
+
+# Metadata
+curl -s http://localhost:3000/api/assets/ASSET_ID | jq .
+
+# Serve card rendition
+curl -s -o /dev/null -w "HTTP %{http_code}\n" \
+  "http://localhost:3000/api/assets/ASSET_ID/file?variant=card"</code></pre>
+    </section>
+
+    <section>
+      <h2>4. Playwright — upload automation (required)</h2>
+      <p style="font-size:0.9rem;color:var(--muted)">File: <code>e2e/asset-upload.spec.ts</code></p>
+      <ul class="checklist checklist--agent">
+        <li>Create concept via UI or API fixture</li>
+        <li>Open <code>/concepts/:id</code> — upload control visible (<code>data-testid="asset-upload"</code>)</li>
+        <li>Set file input to <code>e2e/fixtures/sample.png</code> — submit upload</li>
+        <li>Preview image visible (<code>data-testid="asset-preview"</code>)</li>
+        <li>Success toast or stable preview after reload</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>5. Manual (≤ 3)</h2>
+      <ul class="checklist checklist--manual">
+        <li>Docker Desktop running if script reports Postgres unhealthy</li>
+        <li>Port 3000 / 5432 not blocked by other processes</li>
+        <li>GitHub PR merge after review (agent does not merge)</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>6. PR checklist (paste in body)</h2>
+      <ul class="checklist checklist--agent">
+        <li><code>./scripts/validate-p2.sh</code> — all PASS</li>
+        <li>Branch <code>phase/2-asset-upload</code></li>
+        <li>Screenshot or note: upload + preview on concept detail</li>
+        <li>No secrets in diff</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Out of scope for this gate</h2>
+      <ul>
+        <li>Variation lineage, AI generation, poster mock</li>
+        <li>Cloud CDN</li>
+        <li>Manual visual QA of image quality beyond automated resize checks</li>
+      </ul>
+    </section>
+  </article>
+</body>
+</html>
