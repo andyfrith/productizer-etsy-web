@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Requirements — P3 Variation Lineage</title>
+  <link rel="stylesheet" href="../shared.css" />
+</head>
+<body class="wide">
+  <nav class="breadcrumb">
+    <a href="../index.html">Constitution</a> /
+    <a href="index.html">P3 Variation Lineage</a> / Requirements
+  </nav>
+  <article>
+    <h1>Requirements — P3 Variation Lineage</h1>
+    <p class="lead">Functional and technical requirements for variation branching and approval. Satisfies roadmap phase 3 and unblocks P4 AI generation.</p>
+
+    <div class="decided">
+      <span class="label">Locked decisions</span>
+      <ul style="margin:0.5rem 0 0 1.25rem">
+        <li>Phase: <strong>P3</strong> — full roadmap variation lineage scope</li>
+        <li>API: <strong>REST</strong> under <code>/api/concepts/:id/variations</code></li>
+        <li>Runtime: <strong>pnpm</strong>, <strong>Node 22 LTS</strong></li>
+        <li>Validation bar: <strong>automated script + curl + Playwright approve E2E</strong></li>
+        <li>Spec folder: <code>specs/20260520-phase3-variation-lineage/</code></li>
+        <li>Git branch: <code>phase/3-variation-lineage</code> → merge via PR to <code>master</code></li>
+      </ul>
+    </div>
+
+    <section>
+      <h2>Goal</h2>
+      <p>
+        On a concept detail page, a user can create <strong>variations</strong> (uploaded art directions) with optional
+        <strong>parent/child lineage</strong>, compare them in a gallery, and <strong>approve</strong> or <strong>reject</strong> candidates.
+        At most one variation is <code>approved</code> per concept at a time. Variations are distinct from P2 <em>reference</em> assets but may be seeded from a reference image.
+      </p>
+    </section>
+
+    <section>
+      <h2>Prerequisites (P2 merged)</h2>
+      <ul>
+        <li><code>design_concepts</code> + <code>design_assets</code>; <code>preview_asset_id</code>; reference gallery APIs</li>
+        <li><code>sharp</code> rendition pipeline under <code>STORAGE_ROOT</code> (reuse patterns from P2)</li>
+        <li>P2 validation: <code>./scripts/validate-p2.sh</code> passes on <code>master</code></li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Requirements (MUST)</h2>
+      <table>
+        <thead><tr><th>ID</th><th>Requirement</th><th>Acceptance</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><code>R3.1</code></td>
+            <td><code>concept_variations</code> table</td>
+            <td>Drizzle schema + migration: <code>id</code> (uuid), <code>concept_id</code> (FK → <code>design_concepts</code>, cascade delete), <code>parent_variation_id</code> (nullable self-FK), <code>source_asset_id</code> (nullable FK → <code>design_assets</code>), <code>status</code> (<code>pending</code> | <code>approved</code> | <code>rejected</code>), <code>prompt_snapshot</code> (nullable text, for P4), <code>storage_key</code>, <code>thumb_key</code>, <code>card_key</code>, <code>full_key</code>, <code>byte_size</code>, optional <code>width</code>/<code>height</code>, <code>created_at</code>, <code>updated_at</code>; aligns with <a href="../tech-stack.html" style="color:var(--link)">tech-stack</a> excerpt</td>
+          </tr>
+          <tr>
+            <td><code>R3.2</code></td>
+            <td>Approved variation link</td>
+            <td><code>design_concepts.approved_variation_id</code> (nullable FK → <code>concept_variations.id</code>); set when a variation is approved; cleared when that variation is rejected or deleted</td>
+          </tr>
+          <tr>
+            <td><code>R3.3</code></td>
+            <td>List variations API</td>
+            <td><code>GET /api/concepts/:id/variations</code> returns JSON array sorted by <code>createdAt</code> desc; each item includes <code>id</code>, <code>conceptId</code>, <code>parentVariationId</code>, <code>sourceAssetId</code>, <code>status</code>, thumb URL or path helper, <code>createdAt</code>; 404 if concept missing</td>
+          </tr>
+          <tr>
+            <td><code>R3.4</code></td>
+            <td>Create variation (upload)</td>
+            <td><code>POST /api/concepts/:id/variations</code> accepts <code>multipart/form-data</code>: field <code>file</code> (required), optional <code>parentVariationId</code>; same MIME/size rules as P2 assets; writes renditions under <code>{STORAGE_ROOT}/variations/{id}/</code>; returns 201 + variation JSON</td>
+          </tr>
+          <tr>
+            <td><code>R3.5</code></td>
+            <td>Create variation from reference</td>
+            <td><code>POST /api/concepts/:id/variations/from-asset</code> JSON body <code>{ assetId, parentVariationId? }</code>; copies rendition files from the reference asset into variation storage (server-side); sets <code>source_asset_id</code>; 400 if asset not linked to concept or archived</td>
+          </tr>
+          <tr>
+            <td><code>R3.6</code></td>
+            <td>Update variation status</td>
+            <td><code>PATCH /api/concepts/:id/variations/:variationId</code> body <code>{ status }</code> where status is <code>pending</code> | <code>approved</code> | <code>rejected</code>; validates concept ownership</td>
+          </tr>
+          <tr>
+            <td><code>R3.7</code></td>
+            <td>Single approved rule</td>
+            <td>When status becomes <code>approved</code>, any other <code>approved</code> variation for the same concept becomes <code>pending</code> (or previous approved cleared from <code>approved_variation_id</code>); <code>approved_variation_id</code> on concept updated to the new winner</td>
+          </tr>
+          <tr>
+            <td><code>R3.8</code></td>
+            <td>Serve variation images</td>
+            <td><code>GET /api/variations/:id/file?variant=thumb|card|full</code> streams bytes with correct <code>Content-Type</code>; 404 when missing</td>
+          </tr>
+          <tr>
+            <td><code>R3.9</code></td>
+            <td><code>VariationGallery</code> UI</td>
+            <td>On concept detail: grid of variation cards with thumb, status badge (<code>pending</code>/<code>approved</code>/<code>rejected</code>), parent indicator when <code>parentVariationId</code> set; <code>data-testid="variation-gallery"</code></td>
+          </tr>
+          <tr>
+            <td><code>R3.10</code></td>
+            <td>Approve / reject actions</td>
+            <td>Each pending card: <strong>Approve</strong> (<code>data-testid="variation-approve"</code>) and <strong>Reject</strong> (<code>data-testid="variation-reject"</code>); approved card shows distinct styling; Sonner toast on success</td>
+          </tr>
+          <tr>
+            <td><code>R3.11</code></td>
+            <td>Upload &amp; branch UX</td>
+            <td><code>data-testid="variation-upload"</code> file input + submit; optional <strong>Branch from preview</strong> (<code>data-testid="variation-from-preview"</code>) when concept has <code>previewAssetId</code>; optional <strong>Branch</strong> on a card sets <code>parentVariationId</code> for next upload</td>
+          </tr>
+          <tr>
+            <td><code>R3.12</code></td>
+            <td>Framer Motion</td>
+            <td>Gallery uses <code>framer-motion</code> staggered entrance for cards (<code>staggerChildren</code> on container); respects <code>prefers-reduced-motion</code> (instant layout, no stagger)</td>
+          </tr>
+          <tr>
+            <td><code>R3.13</code></td>
+            <td>TanStack Query hooks</td>
+            <td><code>useVariations(conceptId)</code>, mutations for create, create-from-asset, patch status; invalidates <code>['variations', conceptId]</code> and concept detail on success</td>
+          </tr>
+          <tr>
+            <td><code>R3.14</code></td>
+            <td>Unit tests</td>
+            <td>Vitest: variation Zod schema and/or status transition helper (single-approved rule)</td>
+          </tr>
+          <tr>
+            <td><code>R3.15</code></td>
+            <td>E2E approve flow</td>
+            <td>Playwright <code>e2e/variation-lineage.spec.ts</code>: create concept, upload variation (or from preview), approve one, assert approved badge and second approve demotes first</td>
+          </tr>
+          <tr>
+            <td><code>R3.16</code></td>
+            <td>Validation script</td>
+            <td><code>./scripts/validate-p3.sh</code> with <code>--tier docs</code> before implementation; full tier before PR</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>Requirements (SHOULD)</h2>
+      <table>
+        <thead><tr><th>ID</th><th>Requirement</th><th>Acceptance</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><code>R3.S1</code></td>
+            <td>Variation count on concept card</td>
+            <td>Studio gallery card shows count of non-rejected variations (optional query or denormalized count)</td>
+          </tr>
+          <tr>
+            <td><code>R3.S2</code></td>
+            <td>Filter rejected</td>
+            <td>Gallery toggle or default hide <code>rejected</code> with “Show rejected” control</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>Out of scope</h2>
+      <ul>
+        <li>AI image generation, TanStack AI streaming, <code>ImageGenerationProvider</code> (P4)</li>
+        <li><code>prompt_snapshot</code> population from AI jobs (P4)</li>
+        <li>Poster / product mock compositing (P5)</li>
+        <li>Studio dashboard hero + variation count home page (P6)</li>
+        <li>Auth, multi-user, Etsy, niche research</li>
+        <li>Hard-delete variations (archive pattern deferred; reject status suffices for P3)</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Proposed repo layout</h2>
+      <pre><code>src/lib/db/schema.ts                          # conceptVariations + approvedVariationId
+src/lib/variations/
+  repository.ts
+  process-image.ts                            # reuse sharp helpers from assets where possible
+  storage-paths.ts
+  types.ts
+src/lib/schemas/variation.ts
+src/app/api/concepts/[id]/variations/route.ts
+src/app/api/concepts/[id]/variations/from-asset/route.ts
+src/app/api/concepts/[id]/variations/[variationId]/route.ts
+src/app/api/variations/[id]/file/route.ts
+src/components/variations/variation-gallery.tsx
+src/hooks/use-variations.ts
+e2e/variation-lineage.spec.ts
+scripts/validate-p3.sh
+drizzle/0005_*.sql</code></pre>
+    </section>
+
+    <section id="phase-amendments">
+      <h2>Phase amendments</h2>
+      <p style="font-size:0.9rem;color:var(--muted)">In-phase drop-ins after kickoff. Empty at planning time.</p>
+      <table>
+        <thead><tr><th>Date</th><th>Change</th><th>IDs affected</th></tr></thead>
+        <tbody>
+          <tr><td colspan="3" style="color:var(--muted)">— none —</td></tr>
+        </tbody>
+      </table>
+    </section>
+  </article>
+</body>
+</html>

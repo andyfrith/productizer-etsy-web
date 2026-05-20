@@ -20,10 +20,10 @@ Read `specs/git-workflow.html` and skill `productizer-git-workflow` when doing p
 - Before opening/updating a PR, agent runs `./scripts/validate-p0.sh` (or phase script) and fixes all FAILs. Use skill `productizer-phase-validate`. Minimize manual user checks.
 - Do not force-push `master`.
 
-## P2 (current)
+## P3 (current)
 
-- Branch: `phase/2-asset-upload`
-- Spec: `specs/20260520-phase2-asset-upload/`
+- Branch: `phase/3-variation-lineage`
+- Spec: `specs/20260520-phase3-variation-lineage/`
 
 ## In-phase drop-in requests
 

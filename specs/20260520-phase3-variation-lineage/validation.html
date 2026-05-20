@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Validation — P3 Variation Lineage</title>
+  <link rel="stylesheet" href="../shared.css" />
+  <style>
+    .checklist { list-style: none; margin-left: 0; padding: 0; }
+    .checklist li {
+      padding: 0.5rem 0.75rem;
+      margin-bottom: 0.35rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 0.9rem;
+    }
+    .checklist--agent li::before { content: "Auto · "; font-weight: 600; color: var(--accent); }
+    .checklist--manual li::before { content: "👤 "; color: var(--muted); }
+    .gate-ok {
+      border-left: 3px solid var(--idea);
+      background: rgba(61, 154, 106, 0.1);
+      padding: 1rem;
+      border-radius: 0 8px 8px 0;
+      margin: 1rem 0;
+    }
+  </style>
+</head>
+<body class="wide">
+  <nav class="breadcrumb">
+    <a href="../index.html">Constitution</a> /
+    <a href="index.html">P3 Variation Lineage</a> / Validation
+  </nav>
+  <article>
+    <h1>Validation — P3 Variation Lineage</h1>
+    <p class="lead">
+      <strong>Agents run automation first.</strong> Use <code>./scripts/validate-p3.sh</code>, <code>curl</code>, and Playwright variation specs.
+      Manual user checks are minimal (merge approval, environment blockers only).
+    </p>
+
+    <div class="gate-ok">
+      <strong>PR-ready when:</strong> <code>./scripts/validate-p3.sh</code> exits 0, branch is <code>phase/3-variation-lineage</code>, agent pasted validation summary in PR.
+      Skills: <code>productizer-phase-validate</code>, <code>productizer-p3-variation-lineage</code>.
+    </div>
+
+    <section>
+      <h2>1. Agent — run validation script</h2>
+      <pre><code>chmod +x scripts/validate-p3.sh scripts/validate-lib.sh
+
+# Spec + docs only (planning PR or before implementation)
+./scripts/validate-p3.sh --tier docs
+
+# Full P3 (after implementation)
+./scripts/validate-p3.sh</code></pre>
+    </section>
+
+    <section>
+      <h2>2. Agent — what the script verifies</h2>
+      <table>
+        <thead><tr><th>Area</th><th>Automated how</th></tr></thead>
+        <tbody>
+          <tr><td>Git branch</td><td><code>phase/3-variation-lineage</code></td></tr>
+          <tr><td>Secrets</td><td>Diff vs <code>master</code> — no <code>.env.local</code>, keys</td></tr>
+          <tr><td>Spec files</td><td><code>specs/20260520-phase3-variation-lineage/</code> index, requirements, plan, validation</td></tr>
+          <tr><td>P0–P2 regression</td><td>Postgres healthy; <code>/api/health/db</code>; concepts + asset upload curl smoke</td></tr>
+          <tr><td>Schema (full tier)</td><td><code>concept_variations</code> + <code>approved_variation_id</code> in schema + migration</td></tr>
+          <tr><td>API routes (full tier)</td><td><code>src/app/api/concepts/[id]/variations/</code>, file route</td></tr>
+          <tr><td>Gate (full tier)</td><td><code>pnpm db:migrate lint test build test:e2e</code></td></tr>
+          <tr><td>Variation smoke (full tier)</td><td><code>curl</code> POST variation → PATCH approve → GET list shows approved</td></tr>
+          <tr><td>Approve UX</td><td><strong>Playwright</strong> <code>e2e/variation-lineage.spec.ts</code></td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>3. Agent — curl reference (debug)</h2>
+      <pre><code># Create concept
+CONCEPT_ID=$(curl -sf -X POST http://localhost:3000/api/concepts \
+  -H 'Content-Type: application/json' \
+  -d '{"name":"validate-p3","campaignLabel":"validate"}' | jq -r .id)
+
+# Upload variation image
+VAR_BODY=$(curl -sf -X POST "http://localhost:3000/api/concepts/$CONCEPT_ID/variations" \
+  -F "file=@e2e/fixtures/sample.png")
+VAR_ID=$(echo "$VAR_BODY" | jq -r .id)
+
+# Approve
+curl -sf -X PATCH "http://localhost:3000/api/concepts/$CONCEPT_ID/variations/$VAR_ID" \
+  -H 'Content-Type: application/json' \
+  -d '{"status":"approved"}' | jq .
+
+# List
+curl -sf "http://localhost:3000/api/concepts/$CONCEPT_ID/variations" | jq .
+
+# From preview asset (after P2 upload sets preview)
+curl -sf -X POST "http://localhost:3000/api/concepts/$CONCEPT_ID/variations/from-asset" \
+  -H 'Content-Type: application/json' \
+  -d "{\"assetId\":\"ASSET_ID\"}" | jq .
+
+# Serve card rendition
+curl -s -o /dev/null -w "HTTP %{http_code}\n" \
+  "http://localhost:3000/api/variations/$VAR_ID/file?variant=card"</code></pre>
+    </section>
+
+    <section>
+      <h2>4. Playwright — variation automation (required, full tier)</h2>
+      <p style="font-size:0.9rem;color:var(--muted)">File: <code>e2e/variation-lineage.spec.ts</code></p>
+      <ul class="checklist checklist--agent">
+        <li>Create concept; open <code>/concepts/:id</code></li>
+        <li><code>variation-gallery</code> visible; upload via <code>variation-upload</code></li>
+        <li>New card appears with <code>pending</code> status</li>
+        <li>Click <code>variation-approve</code> — card shows approved styling</li>
+        <li>Upload second variation; approve it — first is no longer sole approved (single-approved rule)</li>
+        <li>Optional: <code>variation-from-preview</code> when preview asset exists</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>5. Manual (≤ 3)</h2>
+      <ul class="checklist checklist--manual">
+        <li>Docker Desktop running if script reports Postgres unhealthy</li>
+        <li>Port 3000 / 5432 not blocked</li>
+        <li>GitHub PR merge after review</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>6. PR checklist (agent)</h2>
+      <ul class="checklist checklist--agent">
+        <li>Branch <code>phase/3-variation-lineage</code></li>
+        <li>Paste <code>./scripts/validate-p3.sh</code> summary (PASS/FAIL counts)</li>
+        <li>Link phase spec <code>specs/20260520-phase3-variation-lineage/</code></li>
+        <li>Note migrations to run: <code>pnpm db:migrate</code></li>
+      </ul>
+    </section>
+  </article>
+</body>
+</html>
