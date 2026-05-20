@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Productizer — Brainstorm Hub</title>
+  <link rel="stylesheet" href="shared.css" />
+  <style>
+    body { max-width: 960px; padding-top: 0; }
+    .site-header {
+      padding: 2rem 2rem 1.25rem;
+      margin: 0 -2rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(180deg, var(--surface) 0%, var(--bg) 100%);
+    }
+    .site-header .mock-grid { margin-top: 1.25rem; justify-content: center; }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <h1>Productizer — Brainstorm</h1>
+    <p class="lead" style="margin-bottom:0">
+      Visual brainstorm docs for a niche-specific Etsy product platform. Each page uses diagrams and mini mockups—not text-only walls.
+    </p>
+    <div class="mock-grid">
+      <div class="mock-card"><div class="mini-mock mini-mock--poster"></div><span>Poster</span></div>
+      <div class="mock-card"><div class="mini-mock mini-mock--sign"></div><span>Sign</span></div>
+      <div class="mock-card"><div class="mini-mock mini-mock--tumbler"></div><span>Tumbler</span></div>
+      <div class="mock-card"><div class="mini-mock mini-mock--shirt"></div><span>Shirt</span></div>
+      <div class="mock-card"><div class="mini-mock mini-mock--planner"></div><span>Digital (later)</span></div>
+    </div>
+  </header>
+
+  <main style="padding:0 0 1rem">
+  <h2 style="font-size:0.85rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:1rem">Topics</h2>
+  <nav class="hub-grid" aria-label="Brainstorm topics">
+    <a class="hub-card" href="vision-and-personas.html">
+      <div class="hub-card-thumb"><div class="mini-mock mini-mock--niche" style="width:80px"></div></div>
+      <div class="hub-card-body"><h3>Vision &amp; Personas</h3><p>Who we serve—with persona cards and JTBD flow.</p></div>
+    </a>
+    <a class="hub-card" href="core-modules.html">
+      <div class="hub-card-thumb">
+        <div class="mini-mock mini-mock--niche" style="width:48px"></div>
+        <span class="flow-arrow" style="margin:0 0.25rem">→</span>
+        <div class="mini-mock mini-mock--ai" style="width:48px"></div>
+      </div>
+      <div class="hub-card-body"><h3>Core Modules</h3><p>Module map with visual tiles.</p></div>
+    </a>
+    <a class="hub-card" href="product-workflows.html">
+      <div class="hub-card-thumb" style="font-size:0.9rem;font-weight:600;color:var(--accent)">Niche → Mock → Etsy</div>
+      <div class="hub-card-body"><h3>Product Workflows</h3><p>Pipeline diagram + lifecycle states.</p></div>
+    </a>
+    <a class="hub-card" href="niche-and-marketing.html">
+      <div class="hub-card-thumb"><div class="mini-mock mini-mock--niche" style="width:96px"></div></div>
+      <div class="hub-card-body"><h3>Niche &amp; Marketing</h3><p>Niche cards, keywords, SEO visuals.</p></div>
+    </a>
+    <a class="hub-card" href="image-generator.html">
+      <div class="hub-card-thumb"><div class="mini-mock mini-mock--variations" style="width:64px"></div></div>
+      <div class="hub-card-body"><h3>Image Generator</h3><p>Concept → variations → mocks.</p></div>
+    </a>
+    <a class="hub-card" href="etsy-integration.html">
+      <div class="hub-card-thumb"><div class="mini-mock mini-mock--etsy" style="width:64px"></div></div>
+      <div class="hub-card-body"><h3>Etsy Integration</h3><p>Export vs draft—side-by-side compare.</p></div>
+    </a>
+    <a class="hub-card" href="mvp-and-phases.html">
+      <div class="hub-card-thumb" style="font-size:2rem;line-height:88px;text-align:center;color:var(--accent)">0→16</div>
+      <div class="hub-card-body"><h3>MVP &amp; Phases</h3><p>Visual phase timeline.</p></div>
+    </a>
+    <a class="hub-card" href="visual-outputs.html">
+      <div class="hub-card-thumb"><div class="mock-grid" style="margin:0"><div class="mini-mock mini-mock--listing" style="width:48px"></div></div></div>
+      <div class="hub-card-body"><h3>Visual Docs Style</h3><p>How these brainstorm pages stay visual.</p></div>
+    </a>
+    <a class="hub-card" href="decisions.html">
+      <div class="hub-card-thumb"><div class="mock-grid" style="margin:0;gap:0.5rem"><div class="mini-mock mini-mock--tumbler" style="width:36px"></div><div class="mini-mock mini-mock--poster" style="width:36px"></div></div></div>
+      <div class="hub-card-body"><h3>Decisions</h3><p>Captured choices with product mocks.</p></div>
+    </a>
+    <a class="hub-card" href="open-questions.html">
+      <div class="hub-card-thumb" style="font-size:2rem;text-align:center;line-height:88px;color:var(--muted)">?</div>
+      <div class="hub-card-body"><h3>Open Questions</h3><p>Still deciding—checklist view.</p></div>
+    </a>
+  </nav>
+  </main>
+
+  <footer style="margin-top:2.5rem;padding-top:1.5rem;border-top:1px solid var(--border);font-size:0.85rem;color:var(--muted)">
+    <strong style="color:var(--text)">Next:</strong> <code>specs/mission.html</code>, <code>specs/tech-stack.html</code>, <code>specs/roadmap.html</code>
+  </footer>
+</body>
+</html>

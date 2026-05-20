@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tech Stack — Productizer Constitution</title>
+  <link rel="stylesheet" href="shared.css" />
+</head>
+<body class="wide">
+  <nav class="breadcrumb"><a href="index.html">Constitution</a> / Tech Stack</nav>
+  <article>
+
+    <div class="page-hero">
+      <div class="page-hero-visual">
+        <pre class="arch-diagram">┌──────────────────────────────────────────────┐
+│  Next.js · React · TypeScript                │
+│  shadcn/ui · Tailwind · Framer Motion        │
+│  TanStack Query · RHF · Zod                  │
+└────────────────────┬─────────────────────────┘
+                     │
+     ┌───────────────┼───────────────┐
+     ▼               ▼               ▼
+ Postgres        Local FS      TanStack AI
+ (Drizzle)       (assets)      → provider layer
+     │               │          (Nano Banana…)
+     └───────────────┴───────────┘
+              Server Actions / Routes
+
+ Vitest (unit) · Playwright (E2E)
+
+ Docker Compose — Postgres (+ optional services)</pre>
+      </div>
+      <div class="page-hero-text">
+        <h1>Tech Stack</h1>
+        <p class="lead">Local operation via <strong>Docker Compose</strong> + <code>pnpm dev</code>. Cloud hosting remains TBD.</p>
+      </div>
+    </div>
+
+    <div class="decided">
+      <span class="label">Decided</span>
+      Next.js App Router · PostgreSQL + Drizzle · <strong>Docker Compose (local)</strong> · local asset volume · shadcn/ui + Tailwind · TanStack Query · TanStack AI · Zod · React Hook Form · Vitest · Playwright · Framer Motion · <strong>polished UX</strong> · deploy hosting TBD
+    </div>
+
+    <section>
+      <h2>Stack summary</h2>
+      <table>
+        <thead><tr><th>Layer</th><th>Choice</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td>Framework</td><td><strong>Next.js 14+ (App Router)</strong></td><td>React, TypeScript, Server Components + Server Actions</td></tr>
+          <tr><td>Styling &amp; UI</td><td><strong>Tailwind CSS + shadcn/ui</strong></td><td>Accessible primitives; consistent design tokens; copy-in components</td></tr>
+          <tr><td>Motion</td><td><strong>Framer Motion</strong></td><td>Page transitions, gallery stagger, micro-interactions</td></tr>
+          <tr><td>Client data</td><td><strong>TanStack Query</strong></td><td>Server state, cache, optimistic updates for concepts/variations</td></tr>
+          <tr><td>Forms</td><td><strong>React Hook Form + Zod</strong></td><td>Concept editor, generation params; shared schemas client/server</td></tr>
+          <tr><td>AI (client/server)</td><td><strong>TanStack AI</strong></td><td>Streaming/status for generation jobs; sits above provider abstraction</td></tr>
+          <tr><td>AI (providers)</td><td><strong>Provider abstraction</strong></td><td>Nano Banana, Nano Banana Pro; swappable backends</td></tr>
+          <tr><td>Database</td><td><strong>PostgreSQL + Drizzle ORM</strong></td><td>Type-safe schema; drizzle-kit migrations</td></tr>
+          <tr><td>Assets</td><td><strong>Local filesystem</strong></td><td><code>./storage/</code> in dev; S3/R2 when hosting decided</td></tr>
+          <tr><td>Unit tests</td><td><strong>Vitest</strong></td><td>Utils, hooks, Zod schemas, server handlers</td></tr>
+          <tr><td>E2E tests</td><td><strong>Playwright</strong></td><td>Critical flows: create concept → variation → approve → mock</td></tr>
+          <tr><td>Auth</td><td><strong>Deferred</strong></td><td>Single-user local dev until multi-tenant needed</td></tr>
+          <tr><td>Local runtime</td><td><strong>Docker + docker-compose</strong></td><td>Postgres in containers; repeatable dev environment for all contributors</td></tr>
+          <tr><td>Hosting (prod)</td><td><strong>TBD</strong></td><td>App may run on host via <code>pnpm dev</code> / <code>pnpm start</code> pointing at Compose services</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>UX &amp; polish (required)</h2>
+      <p>Productizer is a visual creative tool—<strong>great UX and polish are not optional</strong>. Every phase should ship with:</p>
+      <div class="module-grid">
+        <div class="module-tile"><span style="font-size:1.25rem">✦</span><strong>Visual density</strong><span>Mini mocks, thumbs, skeletons</span></div>
+        <div class="module-tile"><span style="font-size:1.25rem">◎</span><strong>Feedback</strong><span>Loading, empty, error states</span></div>
+        <div class="module-tile"><span style="font-size:1.25rem">↻</span><strong>Optimistic UI</strong><span>Query cache + subtle motion</span></div>
+        <div class="module-tile"><span style="font-size:1.25rem">⌨</span><strong>Accessible</strong><span>shadcn + focus, ARIA, keyboard</span></div>
+      </div>
+      <ul>
+        <li><strong>Design system early (P0)</strong> — Tailwind theme (Etsy-adjacent accent), typography, spacing; shadcn Button, Card, Dialog, Sheet, Toast, Skeleton.</li>
+        <li><strong>Motion with purpose</strong> — Framer Motion for gallery layout, approve/reject, route transitions; avoid gratuitous animation.</li>
+        <li><strong>Perceived performance</strong> — skeleton cards in concept gallery; progressive image load (thumb → full).</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>How libraries fit together</h2>
+      <table>
+        <thead><tr><th>Concern</th><th>Tool</th><th>Example use</th></tr></thead>
+        <tbody>
+          <tr><td>Fetch concepts list</td><td>TanStack Query</td><td><code>useQuery(['concepts'], fetchConcepts)</code></td></tr>
+          <tr><td>Create concept form</td><td>RHF + Zod</td><td><code>conceptFormSchema</code> shared with Server Action</td></tr>
+          <tr><td>Generate variations</td><td>TanStack AI + Query</td><td>Stream job status; invalidate variation cache on complete</td></tr>
+          <tr><td>Toast on approve</td><td>shadcn Sonner</td><td>“Variation approved” + thumb preview</td></tr>
+          <tr><td>Gallery enter</td><td>Framer Motion</td><td><code>layout</code> + stagger children</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>Local operation (Docker Compose)</h2>
+      <p>Backing services run in Docker; the Next.js app runs on the host for fast HMR. Same setup for every developer.</p>
+      <div class="flow-pipeline">
+        <div class="flow-step"><span style="font-size:1.25rem">🐳</span><span>docker compose up -d</span></div>
+        <span class="flow-arrow">+</span>
+        <div class="flow-step"><span style="font-size:1.25rem">▶</span><span>pnpm dev</span></div>
+      </div>
+      <div class="row-with-mock">
+        <div class="mini-mock mini-mock--export" style="width:56px" aria-hidden="true"></div>
+        <ul>
+          <li><code>docker compose up -d</code> — Postgres (future: Redis, etc.)</li>
+          <li><code>pnpm dev</code> — Next.js at <code>localhost:3000</code></li>
+          <li><code>./storage/</code> — host path for uploads &amp; generated images (gitignored)</li>
+          <li><code>.env.local</code> — DB URL via Compose port <code>5432</code>, API keys</li>
+          <li><code>docker compose down</code> — stop containers; named volume keeps DB</li>
+        </ul>
+      </div>
+      <h3>docker-compose.yml (excerpt — P0)</h3>
+      <pre><code>services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: productizer-postgres
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: productizer
+      POSTGRES_PASSWORD: productizer
+      POSTGRES_DB: productizer
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U productizer -d productizer"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:</code></pre>
+      <pre><code># .env.local (host app → Compose Postgres)
+DATABASE_URL=postgresql://productizer:productizer@localhost:5432/productizer
+STORAGE_ROOT=./storage
+AI_PROVIDER=nanobanana
+NANOBANANA_API_KEY=...</code></pre>
+      <p style="font-size:0.85rem;color:var(--muted)">Optional later: Redis in Compose for async AI jobs; one-shot migrate container.</p>
+    </section>
+
+    <section>
+      <h2>Core data model (excerpt)</h2>
+      <p>Concept-centric schema for initial phases. Niche research tables come later.</p>
+      <pre><code>// drizzle/schema/concepts.ts (illustrative)
+export const designConcepts = pgTable('design_concepts', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  name: text('name').notNull(),
+  description: text('description'),
+  campaignLabel: text('campaign_label'), // light niche tag until research module
+  styleNotes: text('style_notes'),
+  status: text('status').notNull().default('draft'), // draft | active | archived
+  createdAt: timestamp('created_at').defaultNow(),
+});
+
+export const conceptVariations = pgTable('concept_variations', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  conceptId: uuid('concept_id').references(() => designConcepts.id),
+  parentVariationId: uuid('parent_variation_id'),
+  promptSnapshot: text('prompt_snapshot'),
+  status: text('status').notNull().default('pending'), // pending | approved | rejected
+  storageKey: text('storage_key').notNull(),
+  thumbKey: text('thumb_key'),
+  createdAt: timestamp('created_at').defaultNow(),
+});</code></pre>
+    </section>
+
+    <section>
+      <h2>Forms &amp; validation (excerpt)</h2>
+      <pre><code>// lib/schemas/concept.ts — shared by RHF + Server Actions
+import { z } from 'zod';
+
+export const conceptFormSchema = z.object({
+  name: z.string().min(1).max(120),
+  description: z.string().max(2000).optional(),
+  campaignLabel: z.string().max(80).optional(),
+  styleNotes: z.string().max(1000).optional(),
+});
+
+export type ConceptFormValues = z.infer&lt;typeof conceptFormSchema&gt;;</code></pre>
+      <pre><code>// components/concepts/concept-form.tsx (pattern)
+const form = useForm&lt;ConceptFormValues&gt;({
+  resolver: zodResolver(conceptFormSchema),
+  defaultValues: { name: '', campaignLabel: '' },
+});</code></pre>
+    </section>
+
+    <section>
+      <h2>TanStack Query + AI (excerpt)</h2>
+      <pre><code>// app/providers.tsx
+&lt;QueryClientProvider client={queryClient}&gt;
+  {children}
+&lt;/QueryClientProvider&gt;
+
+// hooks/use-concepts.ts
+export function useConcepts() {
+  return useQuery({ queryKey: ['concepts'], queryFn: listConcepts });
+}
+
+// hooks/use-generate-variations.ts — TanStack AI for streaming/status
+// wraps POST /api/generate → provider abstraction → invalidates ['variations', conceptId]</code></pre>
+    </section>
+
+    <section>
+      <h2>AI provider abstraction (excerpt)</h2>
+      <pre><code>// lib/ai/types.ts — server-side; TanStack AI calls into this
+export interface ImageGenerationProvider {
+  readonly id: string;
+  generate(input: GenerateImageInput): Promise&lt;GenerateImageResult&gt;;
+}
+
+// lib/ai/providers/nanobanana.ts
+// lib/ai/registry.ts — standard vs pro tier</code></pre>
+      <div class="visual-idea">
+        <div class="mini-mock mini-mock--ai" style="width:56px" aria-hidden="true"></div>
+        <div class="visual-idea-body">
+          <strong>Job queue (phase 6+):</strong> In-process or <code>bullmq</code> + Redis when async generation volume warrants it.
+          For local dev, synchronous generation with loading UI is acceptable initially.
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Testing</h2>
+      <table>
+        <thead><tr><th>Tool</th><th>Scope</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Vitest</strong></td><td>Zod schemas, storage paths, AI registry, React hooks (Testing Library)</td></tr>
+          <tr><td><strong>Playwright</strong></td><td>E2E: concept CRUD, upload, gallery approve, poster mock visible</td></tr>
+        </tbody>
+      </table>
+      <pre><code># scripts
+pnpm test          # vitest
+pnpm test:e2e      # playwright test
+pnpm test:e2e:ui   # playwright --ui (local debug)</code></pre>
+    </section>
+
+    <section>
+      <h2>Repo layout (proposed)</h2>
+      <pre><code>productizer-etsy-web/
+├── docker-compose.yml      # Postgres (local)
+├── .env.example
+├── app/
+│   ├── (studio)/           # concept gallery, editor
+│   ├── api/                # Route Handlers
+│   ├── providers.tsx       # QueryClient, theme
+│   └── globals.css         # Tailwind
+├── components/
+│   ├── ui/                 # shadcn/ui
+│   ├── concepts/
+│   └── mini-mock/
+├── hooks/                  # TanStack Query hooks
+├── lib/
+│   ├── db/                 # Drizzle
+│   ├── schemas/            # Zod (shared)
+│   ├── ai/                 # providers + TanStack AI bridge
+│   └── storage/
+├── e2e/                    # Playwright specs
+├── tests/                  # Vitest unit tests
+├── drizzle/
+├── storage/                # gitignored
+└── specs/</code></pre>
+    </section>
+
+    <section>
+      <h2>Out of scope (tech) for initial phases</h2>
+      <ul>
+        <li>Multi-tenant auth, billing, Etsy OAuth</li>
+        <li>Niche research crawlers / Etsy trends ingestion</li>
+        <li>Cloud asset CDN (until hosting decided)</li>
+        <li>Printful/Printify fulfillment APIs</li>
+      </ul>
+    </section>
+
+  </article>
+</body>
+</html>

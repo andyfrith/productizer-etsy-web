@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Validation — P0 Scaffold</title>
+  <link rel="stylesheet" href="../shared.css" />
+  <style>
+    .checklist { list-style: none; margin-left: 0; padding: 0; }
+    .checklist li {
+      padding: 0.5rem 0.75rem;
+      margin-bottom: 0.35rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 0.9rem;
+    }
+    .checklist--agent li::before { content: "🤖 "; }
+    .checklist--manual li::before { content: "👤 "; color: var(--muted); }
+    .gate-ok {
+      border-left: 3px solid var(--idea);
+      background: rgba(61, 154, 106, 0.1);
+      padding: 1rem;
+      border-radius: 0 8px 8px 0;
+      margin: 1rem 0;
+    }
+  </style>
+</head>
+<body class="wide">
+  <nav class="breadcrumb">
+    <a href="../index.html">Constitution</a> /
+    <a href="index.html">P0 Scaffold</a> / Validation
+  </nav>
+  <article>
+    <h1>Validation — P0 Scaffold</h1>
+    <p class="lead">
+      <strong>Agents run automation first.</strong> Use <code>./scripts/validate-p0.sh</code>, <code>curl</code>, and Playwright. Manual user checks are minimal (merge approval, environment blockers only).
+    </p>
+
+    <div class="gate-ok">
+      <strong>PR-ready when:</strong> <code>./scripts/validate-p0.sh</code> exits 0, branch is <code>phase/0-scaffold</code>, agent pasted validation summary in PR. Skill: <code>productizer-phase-validate</code>.
+    </div>
+
+    <section>
+      <h2>1. Agent — run validation script</h2>
+      <p style="font-size:0.9rem;color:var(--muted)">From repo root. Agent must execute and fix failures before opening/updating PR.</p>
+      <pre><code>chmod +x scripts/validate-p0.sh scripts/validate-lib.sh
+
+# Before Next.js exists (docs / infra only)
+./scripts/validate-p0.sh --tier docs
+
+# After scaffold complete (default)
+./scripts/validate-p0.sh</code></pre>
+      <p style="font-size:0.85rem;color:var(--muted)">Script prints <code>PASS</code> / <code>FAIL</code> per check and exits non-zero on failure.</p>
+    </section>
+
+    <section>
+      <h2>2. Agent — what the script verifies</h2>
+      <table>
+        <thead><tr><th>Area</th><th>Automated how</th></tr></thead>
+        <tbody>
+          <tr><td>Git branch</td><td><code>git branch --show-current</code> → <code>phase/0-scaffold</code></td></tr>
+          <tr><td>Secrets</td><td>Diff vs <code>master</code> — no <code>.env.local</code>, keys</td></tr>
+          <tr><td>Spec files</td><td>Existence of plan / requirements / validation / index</td></tr>
+          <tr><td>Postgres</td><td><code>docker compose up -d</code> + healthy</td></tr>
+          <tr><td>Gitignore</td><td><code>.env.local</code>, <code>storage/</code> not tracked</td></tr>
+          <tr><td>Node 22</td><td><code>node -v</code> major 22</td></tr>
+          <tr><td>Scripts</td><td><code>package.json</code> has dev, build, lint, test, test:e2e, db:*</td></tr>
+          <tr><td>Layout</td><td>Required <code>src/</code>, <code>drizzle/</code> paths</td></tr>
+          <tr><td>Gate</td><td><code>pnpm db:migrate lint test build test:e2e</code></td></tr>
+          <tr><td>HTTP home</td><td><code>curl -w %{http_code}</code> → 200; body contains Productizer</td></tr>
+          <tr><td>DB health API</td><td><code>curl /api/health/db</code> → <code>"ok":true</code></td></tr>
+          <tr><td>DB down</td><td>Script stops postgres; curl <code>ok:false</code>; home still 200</td></tr>
+          <tr><td>Accent token</td><td>curl compiled CSS for <code>f56400</code></td></tr>
+          <tr><td>UX polish</td><td><strong>Playwright</strong> in <code>pnpm test:e2e</code> (not human eyes)</td></tr>
+          <tr><td>Dev server</td><td>Script starts <code>pnpm dev</code> if :3000 not up</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>3. Agent — curl reference (debug)</h2>
+      <pre><code># Health (DB up)
+curl -s http://localhost:3000/api/health/db | jq .
+
+# Home
+curl -s -o /dev/null -w "HTTP %{http_code}\n" http://localhost:3000/
+
+# DB down test (script does this automatically)
+docker compose stop postgres
+curl -s http://localhost:3000/api/health/db | jq .
+docker compose up -d postgres</code></pre>
+    </section>
+
+    <section>
+      <h2>4. Playwright — UX automation (required in e2e)</h2>
+      <p style="font-size:0.9rem;color:var(--muted)">Encode former “manual UX” items as E2E assertions so <code>validate-p0.sh</code> covers them:</p>
+      <ul class="checklist checklist--agent">
+        <li>Title / branding: <code>Productizer</code> in <code>&lt;title&gt;</code> or heading</li>
+        <li>Studio shell: not default Next.js welcome page</li>
+        <li>DB status element visible (<code>data-testid="db-status"</code> recommended)</li>
+        <li>Skeleton or loading state during fetch</li>
+        <li>At least one focusable control (button/link)</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>5. User — only when blocked</h2>
+      <ul class="checklist checklist--manual">
+        <li>Docker Desktop not running — start Docker, re-run script</li>
+        <li>Port 3000/5432 in use — free port or change compose port</li>
+        <li>GitHub: approve and merge PR</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Requirements traceability</h2>
+      <table>
+        <thead><tr><th>Req</th><th>Verified by</th></tr></thead>
+        <tbody>
+          <tr><td>R0.1</td><td>script: package.json, build, curl home 200</td></tr>
+          <tr><td>R0.2</td><td>script: CSS grep f56400; Playwright UI</td></tr>
+          <tr><td>R0.3</td><td>Playwright / providers file exists</td></tr>
+          <tr><td>R0.4–R0.5</td><td>db:migrate + curl health API</td></tr>
+          <tr><td>R0.6</td><td>script: storage gitignored</td></tr>
+          <tr><td>R0.7–R0.8</td><td>curl body + Playwright motion/shell</td></tr>
+          <tr><td>R0.9–R0.10</td><td>script: schema + ai paths</td></tr>
+          <tr><td>R0.11–R0.12</td><td>pnpm test + test:e2e</td></tr>
+          <tr><td>R0.13–R0.15</td><td>script: scripts + README exists</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>PR checklist (agent fills)</h2>
+      <pre><code>## Phase P0 — Scaffold
+
+**Branch:** `phase/0-scaffold` → `master`
+
+### Validation
+```
+./scripts/validate-p0.sh
+# paste PASS/FAIL summary here
+```
+
+- [x] Agent ran validate-p0.sh (exit 0)
+- [x] Git: phase/0-scaffold, no secrets in diff
+- [x] Automated: migrate, lint, test, build, test:e2e
+- [x] curl: home 200, /api/health/db ok:true
+- [x] curl: DB-down degradation checked by script
+- [ ] User: merge PR on GitHub
+
+Spec: specs/20260519-phase0-scaffold/</code></pre>
+    </section>
+
+    <section>
+      <h2>Out of scope</h2>
+      <ul>
+        <li>Concept CRUD, uploads, variations, AI generation, poster mock</li>
+        <li>Auth or Etsy integration</li>
+      </ul>
+    </section>
+
+    <p style="margin-top:2rem;font-size:0.85rem">
+      <a href="plan.html" style="color:var(--accent)">← Plan</a> ·
+      <a href="requirements.html" style="color:var(--accent)">← Requirements</a>
+    </p>
+  </article>
+</body>
+</html>

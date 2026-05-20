@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Requirements — P0 Scaffold</title>
+  <link rel="stylesheet" href="../shared.css" />
+</head>
+<body class="wide">
+  <nav class="breadcrumb">
+    <a href="../index.html">Constitution</a> /
+    <a href="index.html">P0 Scaffold</a> / Requirements
+  </nav>
+  <article>
+    <h1>Requirements — P0 Scaffold</h1>
+    <p class="lead">Functional and technical requirements for bootstrapping Productizer. Satisfies roadmap phase 0 and unblocks P1 Concept CRUD.</p>
+
+    <div class="decided">
+      <span class="label">Locked decisions</span>
+      <ul style="margin:0.5rem 0 0 1.25rem">
+        <li>Phase: <strong>P0</strong> — full roadmap scaffold scope</li>
+        <li>Runtime: <strong>pnpm</strong>, <strong>Node 22 LTS</strong></li>
+        <li>Framework: <strong>latest stable Next.js</strong> App Router, TypeScript, <code>--src-dir</code></li>
+        <li>Validation bar: <strong>automated scripts + manual UX/design checks</strong></li>
+        <li>Spec folder: <code>specs/20260519-phase0-scaffold/</code></li>
+        <li>Git branch: <code>phase/0-scaffold</code> → merge via PR to <code>master</code></li>
+      </ul>
+    </div>
+
+    <section>
+      <h2>Goal</h2>
+      <p>
+        A new contributor can clone the repo, start Postgres with Docker, run migrations, and launch a polished minimal studio shell at <code>localhost:3000</code> with working lint, unit tests, E2E smoke, and production build.
+      </p>
+    </section>
+
+    <section>
+      <h2>Prerequisites (already in repo)</h2>
+      <ul>
+        <li><code>docker-compose.yml</code> — Postgres 16 with healthcheck and named volume</li>
+        <li><code>.env.example</code> — <code>DATABASE_URL</code>, <code>STORAGE_ROOT</code>, AI provider placeholders</li>
+        <li>Constitution docs under <code>specs/</code></li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Requirements (MUST)</h2>
+      <table>
+        <thead><tr><th>ID</th><th>Requirement</th><th>Acceptance</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><code>R0.1</code></td>
+            <td>Next.js application scaffold</td>
+            <td><code>pnpm dev</code> serves App Router app; <code>src/</code> directory layout; TypeScript strict; ESLint configured</td>
+          </tr>
+          <tr>
+            <td><code>R0.2</code></td>
+            <td>UI foundation</td>
+            <td>Tailwind CSS; shadcn/ui initialized; theme uses Etsy-adjacent accent (<code>#f56400</code> family per constitution); base components: Button, Card, Skeleton, Sonner toast</td>
+          </tr>
+          <tr>
+            <td><code>R0.3</code></td>
+            <td>Client providers</td>
+            <td><code>QueryClientProvider</code> in root layout; TanStack Query devtools optional in dev only</td>
+          </tr>
+          <tr>
+            <td><code>R0.4</code></td>
+            <td>Database layer</td>
+            <td>Drizzle ORM + <code>drizzle-kit</code>; connection via <code>DATABASE_URL</code>; initial migration creates placeholder or minimal schema (e.g. health/metadata table or empty migration ready for P1 <code>design_concepts</code>)</td>
+          </tr>
+          <tr>
+            <td><code>R0.5</code></td>
+            <td>DB connectivity proof</td>
+            <td>API route or server action returns DB status (e.g. <code>SELECT 1</code>); studio home displays connected / error state</td>
+          </tr>
+          <tr>
+            <td><code>R0.6</code></td>
+            <td>Local storage path</td>
+            <td><code>./storage/</code> gitignored; created on boot if missing; <code>STORAGE_ROOT</code> respected</td>
+          </tr>
+          <tr>
+            <td><code>R0.7</code></td>
+            <td>Studio shell page</td>
+            <td>Home route under <code>(studio)</code> group: product name, phase badge P0, shadcn Card layout, Skeleton loading pattern demo, link placeholder for future concept gallery</td>
+          </tr>
+          <tr>
+            <td><code>R0.8</code></td>
+            <td>Motion dependency</td>
+            <td>Framer Motion installed; one subtle entrance on studio home (validates wiring, not feature work)</td>
+          </tr>
+          <tr>
+            <td><code>R0.9</code></td>
+            <td>Shared validation libs</td>
+            <td>Zod + React Hook Form + <code>@hookform/resolvers</code> installed; example schema in <code>src/lib/schemas/</code> (may mirror future concept schema, unused in UI until P1)</td>
+          </tr>
+          <tr>
+            <td><code>R0.10</code></td>
+            <td>AI stack stub</td>
+            <td>TanStack AI package present; <code>src/lib/ai/</code> with <code>ImageGenerationProvider</code> interface + registry stub (no live API calls required in P0)</td>
+          </tr>
+          <tr>
+            <td><code>R0.11</code></td>
+            <td>Unit tests</td>
+            <td>Vitest + Testing Library; ≥1 test (e.g. schema parse or utility)</td>
+          </tr>
+          <tr>
+            <td><code>R0.12</code></td>
+            <td>E2E tests</td>
+            <td>Playwright configured; ≥1 smoke spec loads studio home and asserts title or heading</td>
+          </tr>
+          <tr>
+            <td><code>R0.13</code></td>
+            <td>Package scripts</td>
+            <td><code>dev</code>, <code>build</code>, <code>start</code>, <code>lint</code>, <code>test</code>, <code>test:e2e</code>, <code>db:generate</code>, <code>db:migrate</code> (names may vary if documented in README)</td>
+          </tr>
+          <tr>
+            <td><code>R0.14</code></td>
+            <td>Node version</td>
+            <td><code>.nvmrc</code> or <code>engines</code> in package.json documents Node 22</td>
+          </tr>
+          <tr>
+            <td><code>R0.15</code></td>
+            <td>Documentation</td>
+            <td>README updated with setup steps matching validation checklist; <code>.env.example</code> stays in sync</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>Requirements (SHOULD)</h2>
+      <ul>
+        <li><code>.node-version</code> or <code>engines</code> + <code>packageManager</code> field for Corepack/pnpm</li>
+        <li>Prettier or existing formatter aligned with Next.js ESLint</li>
+        <li><code>components/mini-mock/</code> placeholder component (static, for P6 dashboard reuse)</li>
+        <li>GitHub Actions workflow stub (lint + test) — optional if deferred, note in PR</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Out of scope (P0)</h2>
+      <ul>
+        <li>Concept CRUD UI and <code>design_concepts</code> table (P1)</li>
+        <li>Asset upload API (P2)</li>
+        <li>Variation gallery, AI generation jobs, poster mock (P3–P5)</li>
+        <li>Auth, Etsy OAuth, niche research (P11+)</li>
+        <li>Production deploy / cloud storage</li>
+        <li>Live calls to Nano Banana or other image APIs</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Non-functional</h2>
+      <ul>
+        <li><strong>UX polish:</strong> Dark-friendly studio shell consistent with constitution mock aesthetic; loading and error states on DB health check</li>
+        <li><strong>Security:</strong> No secrets committed; <code>.env.local</code> gitignored</li>
+        <li><strong>Performance:</strong> <code>pnpm build</code> succeeds without critical warnings</li>
+        <li><strong>Accessibility:</strong> shadcn defaults; focus visible on interactive elements</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Dependencies</h2>
+      <ul>
+        <li>Docker Desktop (or compatible) for Postgres</li>
+        <li>Node 22, pnpm 9+</li>
+        <li>Ports: <code>3000</code> (Next), <code>5432</code> (Postgres)</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Proposed repo layout (post-P0)</h2>
+      <pre><code>productizer-etsy-web/
+├── docker-compose.yml
+├── .env.example
+├── package.json
+├── src/
+│   ├── app/
+│   │   ├── (studio)/page.tsx
+│   │   ├── api/health/db/route.ts
+│   │   ├── layout.tsx
+│   │   └── providers.tsx
+│   ├── components/ui/          # shadcn
+│   ├── lib/db/
+│   ├── lib/schemas/
+│   └── lib/ai/
+├── drizzle/
+├── e2e/
+├── tests/
+└── storage/                    # gitignored</code></pre>
+    </section>
+
+    <p style="margin-top:2rem;font-size:0.85rem">
+      <a href="plan.html" style="color:var(--accent)">→ Implementation plan</a> ·
+      <a href="validation.html" style="color:var(--accent)">→ Validation checklist</a>
+    </p>
+  </article>
+</body>
+</html>

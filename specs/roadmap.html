@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Roadmap — Productizer Constitution</title>
+  <link rel="stylesheet" href="shared.css" />
+</head>
+<body class="wide">
+  <nav class="breadcrumb"><a href="index.html">Constitution</a> / Roadmap</nav>
+  <article>
+
+    <div class="page-hero">
+      <div class="page-hero-visual">
+        <div class="flow-pipeline">
+          <div class="mini-mock mini-mock--concept" style="width:40px" aria-hidden="true"></div><span>Concepts</span>
+          <div class="mini-mock mini-mock--variations" style="width:40px" aria-hidden="true"></div>
+          <div class="mini-mock mini-mock--poster" style="width:40px" aria-hidden="true"></div>
+          <div class="mini-mock mini-mock--etsy" style="width:40px" aria-hidden="true"></div>
+          <div class="mini-mock mini-mock--niche" style="width:40px" aria-hidden="true"></div><span>Research</span>
+        </div>
+      </div>
+      <div class="page-hero-text">
+        <h1>Roadmap</h1>
+        <p class="lead">Micro-phases. <strong>P0–P6</strong> = design concept creation &amp; management. Niche research is <strong>P14+</strong>.</p>
+      </div>
+    </div>
+
+    <div class="focus-now">
+      <strong>Lane key:</strong>
+      <span class="lane-tag lane-tag--now">now</span> initial focus &nbsp;
+      <span class="lane-tag lane-tag--next">next</span> POD expansion &nbsp;
+      <span class="lane-tag lane-tag--later">later</span> Etsy, niche research, cloud, digital
+    </div>
+
+    <section>
+      <h2>Phase lanes (visual)</h2>
+      <div class="phase-lane">
+        <h3><span class="lane-tag lane-tag--now">now</span> Design Concept Studio (P0–P6)</h3>
+        <div class="flow-pipeline" style="margin:0">
+          <div class="mini-mock mini-mock--concept" style="width:36px" aria-hidden="true"></div><div class="mini-mock mini-mock--variations" style="width:36px" aria-hidden="true"></div><div class="mini-mock mini-mock--ai" style="width:36px" aria-hidden="true"></div><div class="mini-mock mini-mock--poster" style="width:36px" aria-hidden="true"></div>
+        </div>
+        <p style="font-size:0.85rem;color:var(--muted);margin-top:0.75rem">Goal: concept → variations → approved mock on poster—<code>docker compose</code> + <code>pnpm dev</code>.</p>
+      </div>
+      <div class="phase-lane">
+        <h3><span class="lane-tag lane-tag--next">next</span> POD breadth (P7–P10)</h3>
+        <div class="mock-grid" style="margin:0.5rem 0 0"><div class="mini-mock mini-mock--sign" style="width:40px" aria-hidden="true"></div><div class="mini-mock mini-mock--tumbler" style="width:40px" aria-hidden="true"></div><div class="mini-mock mini-mock--shirt" style="width:40px" aria-hidden="true"></div></div>
+      </div>
+      <div class="phase-lane">
+        <h3><span class="lane-tag lane-tag--later">later</span> Marketplace &amp; research (P11–P16)</h3>
+        <p style="font-size:0.85rem;color:var(--muted)">Auth, Etsy, <strong>Niche Research Module</strong>, cloud hosting, digital products.</p>
+      </div>
+    </section>
+
+    <section>
+      <h2>All phases</h2>
+      <div class="phase-timeline">
+      <div class="phase-row">
+        <span class="phase-num">0</span>
+        <div class="mini-mock mini-mock--concept" style="width:40px" aria-hidden="true"></div>
+        <div class="phase-row-text">
+          <span class="lane-tag lane-tag--now">now</span>
+          <strong>Scaffold</strong> — Next.js, Tailwind, shadcn/ui, Drizzle, <strong>docker-compose.yml</strong> (Postgres), TanStack Query, Vitest + Playwright, Framer Motion, design tokens.
+          <br><span style="color:var(--muted);font-size:0.8rem">Deliverable: docker compose up -d; pnpm dev; drizzle migrate; .env.example · <a href="20260519-phase0-scaffold/index.html" style="color:var(--accent)">Phase spec →</a></span>
+        </div>
+      </div>
+      <div class="phase-row">
+        <span class="phase-num">1</span>
+        <div class="mini-mock mini-mock--concept" style="width:40px" aria-hidden="true"></div>
+        <div class="phase-row-text">
+          <span class="lane-tag lane-tag--now">now</span>
+          <strong>Concept CRUD</strong> — Create, edit, archive design concepts. RHF + Zod form; polished Card layout.
+          <br><span style="color:var(--muted);font-size:0.8rem">Deliverable: designConcepts + ConceptForm (shadcn) + useConcepts query</span>
+        </div>
+      </div>
+      <div class="phase-row">
+        <span class="phase-num">2</span>
+        <div class="mini-mock mini-mock--variations" style="width:40px" aria-hidden="true"></div>
+        <div class="phase-row-text">
+          <span class="lane-tag lane-tag--now">now</span>
+          <strong>Asset upload</strong> — Upload reference art; store thumb/card/full under ./storage.
+          <br><span style="color:var(--muted);font-size:0.8rem">Deliverable: POST /api/assets</span>
+        </div>
+      </div>
+      <div class="phase-row">
+        <span class="phase-num">3</span>
+        <div class="mini-mock mini-mock--variations" style="width:40px" aria-hidden="true"></div>
+        <div class="phase-row-text">
+          <span class="lane-tag lane-tag--now">now</span>
+          <strong>Variation lineage</strong> — Parent/child variations; gallery grid with approve/reject.
+          <br><span style="color:var(--muted);font-size:0.8rem">Deliverable: VariationGallery (Framer Motion stagger) + Playwright approve flow</span>
+        </div>
+      </div>
+      <div class="phase-row">
+        <span class="phase-num">4</span>
+        <div class="mini-mock mini-mock--ai" style="width:40px" aria-hidden="true"></div>
+        <div class="phase-row-text">
+          <span class="lane-tag lane-tag--now">now</span>
+          <strong>AI provider spike</strong> — TanStack AI + provider abstraction; Nano Banana 1→N variations with streaming status.
+          <br><span style="color:var(--muted);font-size:0.8rem">Deliverable: ImageGenerationProvider + useGenerateVariations hook</span>
+        </div>
+      </div>
+      <div class="phase-row">
+        <span class="phase-num">5</span>
+        <div class="mini-mock mini-mock--poster" style="width:40px" aria-hidden="true"></div>
+        <div class="phase-row-text">
+          <span class="lane-tag lane-tag--now">now</span>
+          <strong>First mock template</strong> — Poster/art print flat mock + MiniMock in product picker.
+          <br><span style="color:var(--muted);font-size:0.8rem">Deliverable: ProductType poster + composite</span>
+        </div>
+      </div>
+      <div class="phase-row">
+        <span class="phase-num">6</span>
+        <div class="mini-mock mini-mock--concept" style="width:40px" aria-hidden="true"></div>
+        <div class="phase-row-text">
+          <span class="lane-tag lane-tag--now">now</span>
+          <strong>Concept dashboard</strong> — Visual home: shadcn Cards, Skeleton loading, hero thumb + variation count.
+          <br><span style="color:var(--muted);font-size:0.8rem">Deliverable: MiniMock component</span>
+        </div>
+      </div>
+      <div class="phase-row">
+        <span class="phase-num">7</span>
+        <div class="mini-mock mini-mock--sign" style="width:40px" aria-hidden="true"></div>
+        <div class="phase-row-text">
+          <span class="lane-tag lane-tag--next">next</span>
+          <strong>Signs mock</strong> — Second POD type; reuse concept → new ProductType.
+          <br><span style="color:var(--muted);font-size:0.8rem">Deliverable: productTypes seed</span>
+        </div>
+      </div>
+      <div class="phase-row">
+        <span class="phase-num">8</span>
+        <div class="mini-mock mini-mock--export" style="width:40px" aria-hidden="true"></div>
+        <div class="phase-row-text">
+          <span class="lane-tag lane-tag--next">next</span>
+          <strong>Export preview</strong> — ZIP + preview.html with embedded thumbs.
+          <br><span style="color:var(--muted);font-size:0.8rem">Deliverable: export pack builder</span>
+        </div>
+      </div>
+      <div class="phase-row">
+        <span class="phase-num">9</span>
+        <div class="mini-mock mini-mock--tumbler" style="width:40px" aria-hidden="true"></div>
+        <div class="phase-row-text">
+          <span class="lane-tag lane-tag--next">next</span>
+          <strong>Tumbler mock</strong> — Cylindrical wrap template.
+          <br><span style="color:var(--muted);font-size:0.8rem">Deliverable: wrap mock renderer</span>
+        </div>
+      </div>
+      <div class="phase-row">
+        <span class="phase-num">10</span>
+        <div class="mini-mock mini-mock--shirt" style="width:40px" aria-hidden="true"></div>
+        <div class="phase-row-text">
+          <span class="lane-tag lane-tag--next">next</span>
+          <strong>T-shirt mock</strong> — Apparel placements + size variants placeholder.
+          <br><span style="color:var(--muted);font-size:0.8rem">Deliverable: apparel template</span>
+        </div>
+      </div>
+      <div class="phase-row">
+        <span class="phase-num">11</span>
+        <div class="mini-mock mini-mock--concept" style="width:40px" aria-hidden="true"></div>
+        <div class="phase-row-text">
+          <span class="lane-tag lane-tag--later">later</span>
+          <strong>Auth</strong> — Clerk or Auth.js when multi-user needed.
+          <br><span style="color:var(--muted);font-size:0.8rem">Deliverable: defer until required</span>
+        </div>
+      </div>
+      <div class="phase-row">
+        <span class="phase-num">12</span>
+        <div class="mini-mock mini-mock--listing" style="width:40px" aria-hidden="true"></div>
+        <div class="phase-row-text">
+          <span class="lane-tag lane-tag--later">later</span>
+          <strong>Listing copy v0</strong> — Title/tags from campaign label templates—not full niche research.
+          <br><span style="color:var(--muted);font-size:0.8rem">Deliverable: ListingStudio lite</span>
+        </div>
+      </div>
+      <div class="phase-row">
+        <span class="phase-num">13</span>
+        <div class="mini-mock mini-mock--etsy" style="width:40px" aria-hidden="true"></div>
+        <div class="phase-row-text">
+          <span class="lane-tag lane-tag--later">later</span>
+          <strong>Etsy OAuth + draft</strong> — One draft listing with images.
+          <br><span style="color:var(--muted);font-size:0.8rem">Deliverable: Etsy Open API v3</span>
+        </div>
+      </div>
+      <div class="phase-row">
+        <span class="phase-num">14</span>
+        <div class="mini-mock mini-mock--niche" style="width:40px" aria-hidden="true"></div>
+        <div class="phase-row-text">
+          <span class="lane-tag lane-tag--later">later</span>
+          <strong>Niche Research Module</strong> — Segments, niches, sub-niches, cross-niche; replaces manual labels.
+          <br><span style="color:var(--muted);font-size:0.8rem">Deliverable: NEW module—see mission</span>
+        </div>
+      </div>
+      <div class="phase-row">
+        <span class="phase-num">15</span>
+        <div class="mini-mock mini-mock--export" style="width:40px" aria-hidden="true"></div>
+        <div class="phase-row-text">
+          <span class="lane-tag lane-tag--later">later</span>
+          <strong>Cloud storage</strong> — S3/R2 when hosting decided.
+          <br><span style="color:var(--muted);font-size:0.8rem">Deliverable: StorageAdapter swap</span>
+        </div>
+      </div>
+      <div class="phase-row">
+        <span class="phase-num">16</span>
+        <div class="mini-mock mini-mock--planner" style="width:40px" aria-hidden="true"></div>
+        <div class="phase-row-text">
+          <span class="lane-tag lane-tag--later">later</span>
+          <strong>Digital planners</strong> — Wave 2 product type + file delivery.
+          <br><span style="color:var(--muted);font-size:0.8rem">Deliverable: digital ProductType</span>
+        </div>
+      </div>
+
+      </div>
+    </section>
+
+    <section>
+      <h2>P0 scaffold — commands (excerpt)</h2>
+      <pre><code>pnpm create next-app@latest . --typescript --tailwind --eslint --app --src-dir
+pnpm dlx shadcn@latest init
+pnpm add drizzle-orm postgres @tanstack/react-query @tanstack/ai zod react-hook-form @hookform/resolvers
+pnpm add framer-motion
+pnpm add -D drizzle-kit vitest @vitejs/plugin-react jsdom @testing-library/react
+pnpm create playwright
+docker compose up -d    # Postgres
+pnpm drizzle-kit generate && pnpm drizzle-kit migrate
+pnpm dev              # Next.js on host</code></pre>
+    </section>
+
+    <section>
+      <h2>UI target (concept gallery — wireframe)</h2>
+      <div class="compare-visual">
+        <div style="text-align:center">
+          <div class="mini-mock mini-mock--concept" style="width:64px;margin:0 auto 0.5rem"></div>
+          <span style="font-size:0.75rem;color:var(--muted)">Concept card</span>
+        </div>
+        <span class="vs">+</span>
+        <div style="display:flex;gap:4px">
+          <div class="mini-mock mini-mock--variations" style="width:36px" aria-hidden="true"></div><div class="mini-mock mini-mock--variations" style="width:36px" aria-hidden="true"></div><div class="mini-mock mini-mock--variations" style="width:36px" aria-hidden="true"></div>
+        </div>
+        <span class="vs">→</span>
+        <div class="mini-mock mini-mock--poster" style="width:56px" aria-hidden="true"></div>
+      </div>
+      <p style="font-size:0.85rem;color:var(--muted)">Each concept card shows hero thumb, variation count, status. Click through to gallery → approve → mock.</p>
+    </section>
+
+    <section>
+      <h2>Dependency graph (simplified)</h2>
+      <pre class="arch-diagram">P0 Scaffold
+ └─ P1 Concepts
+     ├─ P2 Upload
+     ├─ P3 Variations
+     │   └─ P4 AI
+     └─ P5 Poster mock
+         └─ P6 Dashboard
+             ├─ P7–P10 more POD types
+             └─ P8 Export
+P14 Niche Research (independent track, later)
+ └─ enhances P12 Listing copy</pre>
+    </section>
+
+  </article>
+</body>
+</html>

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Productizer — Constitution</title>
+  <link rel="stylesheet" href="shared.css" />
+  <style>
+    body { max-width: 960px; padding-top: 0; }
+    .site-header {
+      padding: 2rem 2rem 1.25rem;
+      margin: 0 -2rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(180deg, var(--surface) 0%, var(--bg) 100%);
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <h1>Productizer Constitution</h1>
+    <p class="lead" style="margin-bottom:0.75rem">
+      Mission, tech stack, and phased roadmap. Initial phases center on <strong style="color:var(--accent)">design concept creation &amp; management</strong>.
+    </p>
+    <div class="mock-grid" style="justify-content:flex-start">
+      <div class="mini-mock mini-mock--concept" style="width:56px" aria-hidden="true"></div><div class="mini-mock mini-mock--variations" style="width:56px" aria-hidden="true"></div><div class="mini-mock mini-mock--poster" style="width:56px" aria-hidden="true"></div>
+      <span style="align-self:center;color:var(--muted);font-size:0.85rem">→ Etsy &amp; niche research later</span>
+    </div>
+  </header>
+  <main>
+    <nav class="hub-grid">
+      <a class="hub-card" href="mission.html">
+        <div class="hub-card-thumb"><div class="mini-mock mini-mock--concept" style="width:64px" aria-hidden="true"></div></div>
+        <div class="hub-card-body"><h3>Mission</h3><p>Why we exist, scope now vs later.</p></div>
+      </a>
+      <a class="hub-card" href="tech-stack.html">
+        <div class="hub-card-thumb" style="font-family:monospace;font-size:0.75rem;color:var(--accent)">Docker · shadcn · TanStack</div>
+        <div class="hub-card-body"><h3>Tech Stack</h3><p>UI, data, AI, testing, UX polish.</p></div>
+      </a>
+      <a class="hub-card" href="roadmap.html">
+        <div class="hub-card-thumb" style="font-size:1.25rem;font-weight:700;color:var(--accent)">P0–P18</div>
+        <div class="hub-card-body"><h3>Roadmap</h3><p>Micro-phases with visuals &amp; code touchpoints.</p></div>
+      </a>
+      <a class="hub-card" href="git-workflow.html">
+        <div class="hub-card-thumb" style="font-family:monospace;font-size:0.7rem;color:var(--accent)">phase/N</div>
+        <div class="hub-card-body"><h3>Git Workflow</h3><p>Branch per phase; merge via pull request.</p></div>
+      </a>
+      <a class="hub-card" href="validation-policy.html">
+        <div class="hub-card-thumb" style="font-size:1.1rem">🤖</div>
+        <div class="hub-card-body"><h3>Validation Policy</h3><p>Agent-run scripts, curl, Playwright; minimal manual.</p></div>
+      </a>
+    </nav>
+
+    <h2 style="font-size:1.1rem;margin:2rem 0 0.75rem;padding-bottom:0.35rem;border-bottom:1px solid var(--border);color:var(--accent)">Phase specs (active)</h2>
+    <nav class="hub-grid">
+      <a class="hub-card" href="20260519-phase0-scaffold/index.html">
+        <div class="hub-card-thumb" style="font-size:0.75rem;font-weight:700;color:var(--accent)">P0 · now</div>
+        <div class="hub-card-body">
+          <h3>Phase 0 — Scaffold</h3>
+          <p>Plan, requirements, validation for app bootstrap.</p>
+        </div>
+      </a>
+    </nav>
+
+    <p style="margin-top:2rem;font-size:0.85rem;color:var(--muted)">
+      Brainstorm background: <a href="../brainstorm/index.html" style="color:var(--accent)">../brainstorm/</a>
+    </p>
+  </main>
+</body>
+</html>

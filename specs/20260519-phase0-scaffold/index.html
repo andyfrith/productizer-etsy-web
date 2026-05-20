@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>P0 Scaffold — Phase Spec</title>
+  <link rel="stylesheet" href="../shared.css" />
+</head>
+<body class="wide">
+  <nav class="breadcrumb">
+    <a href="../index.html">Constitution</a> /
+    <a href="../roadmap.html">Roadmap</a> /
+    P0 Scaffold
+  </nav>
+  <article>
+    <div class="page-hero">
+      <div class="page-hero-visual">
+        <div class="flow-pipeline" style="margin:0">
+          <span style="font-size:1.25rem">🐳</span>
+          <span class="flow-arrow">+</span>
+          <span style="font-size:1.25rem">▶</span>
+          <span class="flow-arrow">→</span>
+          <div class="mini-mock mini-mock--concept" style="width:48px" aria-hidden="true"></div>
+        </div>
+      </div>
+      <div class="page-hero-text">
+        <p style="font-size:0.75rem;color:var(--muted);margin-bottom:0.35rem"><span class="phase-tag">P0</span> <span class="lane-tag lane-tag--now">now</span> 20260519-phase0-scaffold</p>
+        <h1 style="margin-bottom:0.35rem">Phase 0 — Scaffold</h1>
+        <p class="lead" style="margin-bottom:0;font-size:0.95rem">
+          Bootstrap the Productizer app: Next.js App Router, design system, Postgres via Docker, Drizzle migrations, test harness, and a minimal studio shell ready for P1 Concept CRUD.
+        </p>
+      </div>
+    </div>
+
+    <div class="focus-now">
+      <strong>Branch:</strong> <code>phase/0-scaffold</code> → PR → <code>master</code> · <a href="../git-workflow.html" style="color:var(--accent)">Git workflow</a>
+    </div>
+
+    <div class="focus-now">
+      <strong>Decisions (spec kickoff):</strong>
+      Full roadmap P0 scope · pnpm · Node 22 · latest stable Next.js App Router · validation = automated gate + manual UX checks
+    </div>
+
+    <section>
+      <h2>Phase documents</h2>
+      <nav class="hub-grid">
+        <a class="hub-card" href="requirements.html">
+          <div class="hub-card-thumb" style="font-size:0.85rem;color:var(--accent)">MUST / SHOULD</div>
+          <div class="hub-card-body">
+            <h3>Requirements</h3>
+            <p>Scope, acceptance criteria, out of scope, dependencies.</p>
+          </div>
+        </a>
+        <a class="hub-card" href="plan.html">
+          <div class="hub-card-thumb" style="font-family:monospace;font-size:0.7rem;color:var(--accent)">1 → 8 steps</div>
+          <div class="hub-card-body">
+            <h3>Plan</h3>
+            <p>Implementation order, file touchpoints, commands.</p>
+          </div>
+        </a>
+        <a class="hub-card" href="validation.html">
+          <div class="hub-card-thumb" style="font-size:1.1rem">✓ gate</div>
+          <div class="hub-card-body">
+            <h3>Validation</h3>
+            <p>Automated scripts + manual checks; PR-ready definition of done.</p>
+          </div>
+        </a>
+      </nav>
+    </section>
+
+    <section>
+      <h2>Upstream references</h2>
+      <ul>
+        <li><a href="../roadmap.html" style="color:var(--accent)">Roadmap</a> — P0 row and dependency graph</li>
+        <li><a href="../tech-stack.html" style="color:var(--accent)">Tech Stack</a> — Docker, repo layout, UX polish</li>
+        <li><a href="../mission.html" style="color:var(--accent)">Mission</a> — scope now vs later</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Deliverable summary</h2>
+      <pre><code>docker compose up -d          # Postgres healthy
+cp .env.example .env.local
+pnpm install
+pnpm db:migrate               # Drizzle applies initial schema
+pnpm dev                      # http://localhost:3000 — studio shell + DB health
+pnpm lint && pnpm test && pnpm build && pnpm test:e2e
+
+# Agent validation (run before PR)
+./scripts/validate-p0.sh</code></pre>
+    </section>
+  </article>
+</body>
+</html>
