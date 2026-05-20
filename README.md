@@ -34,6 +34,8 @@ Open [http://localhost:3000](http://localhost:3000) for the studio shell. **Conc
 
 REST API: `GET/POST /api/concepts`, `GET/PATCH/DELETE /api/concepts/:id` (DELETE archives).
 
+**Database UI:** With Postgres running, `pnpm db:studio` opens Drizzle Kit Studio for inspecting and editing tables (e.g. `design_concepts`).
+
 ### Scripts
 
 | Script | Purpose |
@@ -46,6 +48,7 @@ REST API: `GET/POST /api/concepts`, `GET/PATCH/DELETE /api/concepts/:id` (DELETE
 | `pnpm test:e2e` | Playwright (studio smoke + concept CRUD) |
 | `pnpm db:generate` | Generate Drizzle migrations |
 | `pnpm db:migrate` | Apply migrations |
+| `pnpm db:studio` | Drizzle Kit Studio (browse/edit DB at [https://local.drizzle.studio](https://local.drizzle.studio); requires Postgres + `.env.local`) |
 
 ### Validation (P1)
 

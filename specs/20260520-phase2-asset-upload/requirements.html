@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Requirements — P2 Asset Upload</title>
+  <link rel="stylesheet" href="../shared.css" />
+</head>
+<body class="wide">
+  <nav class="breadcrumb">
+    <a href="../index.html">Constitution</a> /
+    <a href="index.html">P2 Asset Upload</a> / Requirements
+  </nav>
+  <article>
+    <h1>Requirements — P2 Asset Upload</h1>
+    <p class="lead">Functional and technical requirements for reference art uploads. Satisfies roadmap phase 2 and unblocks P3 variation lineage.</p>
+
+    <div class="decided">
+      <span class="label">Locked decisions</span>
+      <ul style="margin:0.5rem 0 0 1.25rem">
+        <li>Phase: <strong>P2</strong> — full roadmap asset upload (thumb, card, full)</li>
+        <li>API: <strong>REST</strong> — <code>POST /api/assets</code> (multipart), <code>GET /api/assets/:id</code>, file route with <code>?variant=</code></li>
+        <li>Runtime: <strong>pnpm</strong>, <strong>Node 22 LTS</strong></li>
+        <li>Validation bar: <strong>automated script + curl + Playwright upload E2E</strong></li>
+        <li>Spec folder: <code>specs/20260520-phase2-asset-upload/</code></li>
+        <li>Git branch: <code>phase/2-asset-upload</code> → merge via PR to <code>master</code></li>
+      </ul>
+    </div>
+
+    <section>
+      <h2>Goal</h2>
+      <p>
+        A user can upload a reference image for a design concept from the concept detail page. The server stores three renditions on disk under <code>STORAGE_ROOT</code> and records metadata in Postgres. The UI shows a preview (card or thumb) after upload.
+      </p>
+    </section>
+
+    <section>
+      <h2>Prerequisites (P1 merged)</h2>
+      <ul>
+        <li><code>design_concepts</code> table and CRUD API/UI</li>
+        <li><code>src/lib/storage.ts</code> — <code>ensureStorageRoot()</code> (P0)</li>
+        <li><code>STORAGE_ROOT</code> in <code>.env.example</code>; <code>storage/</code> gitignored</li>
+        <li>P1 validation: <code>./scripts/validate-p1.sh</code> passes on <code>master</code></li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Requirements (MUST)</h2>
+      <table>
+        <thead><tr><th>ID</th><th>Requirement</th><th>Acceptance</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><code>R2.1</code></td>
+            <td><code>design_assets</code> table</td>
+            <td>Drizzle schema + migration: <code>id</code> (uuid), <code>concept_id</code> (uuid, nullable FK → <code>design_concepts</code>), <code>original_filename</code>, <code>mime_type</code>, <code>storage_key</code> (base path under storage root), <code>thumb_key</code>, <code>card_key</code>, <code>full_key</code>, <code>byte_size</code>, optional <code>width</code>/<code>height</code>, <code>created_at</code></td>
+          </tr>
+          <tr>
+            <td><code>R2.2</code></td>
+            <td>Concept reference link</td>
+            <td><code>design_concepts.reference_asset_id</code> (uuid, nullable FK → <code>design_assets.id</code>); set when upload includes <code>conceptId</code></td>
+          </tr>
+          <tr>
+            <td><code>R2.3</code></td>
+            <td>Upload API</td>
+            <td><code>POST /api/assets</code> accepts <code>multipart/form-data</code>: field <code>file</code> (required), optional <code>conceptId</code>; validates MIME (image/png, image/jpeg, image/webp) and max size (e.g. 10 MB); returns 201 + asset JSON (camelCase)</td>
+          </tr>
+          <tr>
+            <td><code>R2.4</code></td>
+            <td>Rendition generation</td>
+            <td>On upload, write files under <code>{STORAGE_ROOT}/assets/{assetId}/</code>: <code>thumb</code> (max edge ~256px), <code>card</code> (~800px), <code>full</code> (original or max edge ~2048px); use <code>sharp</code> (or equivalent) server-side</td>
+          </tr>
+          <tr>
+            <td><code>R2.5</code></td>
+            <td>Asset read API</td>
+            <td><code>GET /api/assets/:id</code> returns metadata; <code>GET /api/assets/:id/file?variant=thumb|card|full</code> streams bytes with correct <code>Content-Type</code>; 404 when missing</td>
+          </tr>
+          <tr>
+            <td><code>R2.6</code></td>
+            <td>Storage safety</td>
+            <td>Keys are server-generated (no user path segments); reject path traversal; storage root from <code>STORAGE_ROOT</code> only</td>
+          </tr>
+          <tr>
+            <td><code>R2.7</code></td>
+            <td>Upload UI</td>
+            <td>Concept detail <code>/concepts/[id]</code>: file input + upload button; shows thumb/card preview when <code>reference_asset_id</code> set; loading and error states; Sonner toast on success/failure</td>
+          </tr>
+          <tr>
+            <td><code>R2.8</code></td>
+            <td>Client hook</td>
+            <td><code>useUploadAsset</code> mutation (FormData POST); invalidates concept detail query on success</td>
+          </tr>
+          <tr>
+            <td><code>R2.9</code></td>
+            <td>Dev tooling</td>
+            <td><code>pnpm db:studio</code> script documented in README for browsing tables</td>
+          </tr>
+          <tr>
+            <td><code>R2.10</code></td>
+            <td>Unit tests</td>
+            <td>Vitest: upload validation schema and/or storage path helpers</td>
+          </tr>
+          <tr>
+            <td><code>R2.11</code></td>
+            <td>E2E upload</td>
+            <td>Playwright <code>e2e/asset-upload.spec.ts</code>: create concept → upload fixture image → preview visible on detail</td>
+          </tr>
+          <tr>
+            <td><code>R2.12</code></td>
+            <td>P1 regression</td>
+            <td>Existing concept CRUD and P0 health checks still pass in <code>validate-p2.sh</code> gate</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>Requirements (SHOULD)</h2>
+      <table>
+        <thead><tr><th>ID</th><th>Requirement</th><th>Acceptance</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><code>R2.S1</code></td>
+            <td>Replace reference</td>
+            <td>Uploading again for same concept updates <code>reference_asset_id</code> (old asset row may remain or be orphaned—document choice in PR)</td>
+          </tr>
+          <tr>
+            <td><code>R2.S2</code></td>
+            <td>Gallery hint</td>
+            <td>Concept card shows small thumb when reference asset exists (optional polish)</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>Out of scope</h2>
+      <ul>
+        <li><code>concept_variations</code> table and variation gallery (P3)</li>
+        <li>AI image generation (P4)</li>
+        <li>Poster mock / product types (P5–P6)</li>
+        <li>Cloud storage adapter S3/R2 (P16)</li>
+        <li>Auth, multi-user asset ACLs</li>
+        <li>Video or SVG uploads</li>
+        <li>Bulk asset library page (deferred)</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Proposed repo layout</h2>
+      <pre><code>src/lib/db/schema.ts              # design_assets + reference_asset_id
+src/lib/assets/
+  repository.ts
+  process-image.ts                # sharp renditions
+  storage-paths.ts
+src/lib/schemas/asset.ts          # upload limits / MIME
+src/app/api/assets/route.ts       # POST
+src/app/api/assets/[id]/route.ts  # GET metadata
+src/app/api/assets/[id]/file/route.ts
+src/components/assets/asset-upload.tsx
+src/hooks/use-upload-asset.ts
+e2e/asset-upload.spec.ts
+e2e/fixtures/sample.png           # small test image
+drizzle/                          # migration SQL
+storage/                          # gitignored (runtime)</code></pre>
+    </section>
+
+    <section>
+      <h2>UX polish</h2>
+      <ul>
+        <li>Drag-and-drop or clear “Upload reference” affordance on concept detail</li>
+        <li>Skeleton/placeholder while image loads</li>
+        <li>Accessible file input label; error message for invalid type/size</li>
+      </ul>
+    </section>
+  </article>
+</body>
+</html>

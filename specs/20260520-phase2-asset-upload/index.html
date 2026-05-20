@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>P2 Asset Upload — Phase Spec</title>
+  <link rel="stylesheet" href="../shared.css" />
+</head>
+<body class="wide">
+  <nav class="breadcrumb">
+    <a href="../index.html">Constitution</a> /
+    <a href="../roadmap.html">Roadmap</a> /
+    P2 Asset Upload
+  </nav>
+  <article>
+    <header class="page-intro">
+      <p style="font-size:0.75rem;color:var(--muted);margin-bottom:0.35rem"><span class="phase-tag">P2</span> <span class="lane-tag lane-tag--now">now</span> <code>20260520-phase2-asset-upload</code></p>
+      <h1>Phase 2 — Asset Upload</h1>
+      <p class="lead">
+        Upload reference art for design concepts: multipart <code>POST /api/assets</code>, local <code>./storage</code> with thumb/card/full renditions, Drizzle <code>design_assets</code>, studio UI on concept detail—ready for P3 variation lineage.
+      </p>
+    </header>
+
+    <div class="focus-now">
+      <strong>Branch:</strong> <code>phase/2-asset-upload</code> → PR → <code>master</code> · <a href="../git-workflow.html" style="color:var(--link)">Git workflow</a>
+    </div>
+
+    <div class="focus-now">
+      <strong>Decisions (spec kickoff):</strong>
+      Full roadmap P2 scope · REST <code>/api/assets</code> + file serving route · pnpm · Node 22 · validation = automated gate (script + curl + Playwright upload) · Spec folder <code>20260520-phase2-asset-upload</code>
+    </div>
+
+    <section>
+      <h2>Phase documents</h2>
+      <nav class="hub-grid">
+        <a class="hub-card" href="requirements.html">
+          <div class="hub-card-body">
+            <h3>Requirements</h3>
+            <p>Scope, acceptance criteria, out of scope, dependencies.</p>
+          </div>
+        </a>
+        <a class="hub-card" href="plan.html">
+          <div class="hub-card-body">
+            <h3>Plan</h3>
+            <p>Implementation order, file touchpoints, commands.</p>
+          </div>
+        </a>
+        <a class="hub-card" href="validation.html">
+          <div class="hub-card-body">
+            <h3>Validation</h3>
+            <p>Automated scripts + Playwright upload; PR-ready definition of done.</p>
+          </div>
+        </a>
+      </nav>
+    </section>
+
+    <section>
+      <h2>Upstream references</h2>
+      <ul>
+        <li><a href="../roadmap.html" style="color:var(--link)">Roadmap</a> — P2 row; depends on P1</li>
+        <li><a href="../20260519-phase1-concept-crud/index.html" style="color:var(--link)">P1 Concept CRUD spec</a> — merged baseline</li>
+        <li><a href="../tech-stack.html" style="color:var(--link)">Tech Stack</a> — <code>STORAGE_ROOT</code>, asset renditions</li>
+        <li><a href="../mission.html" style="color:var(--link)">Mission</a> — local asset library</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Deliverable summary</h2>
+      <pre><code>git checkout phase/2-asset-upload   # from latest master
+docker compose up -d
+pnpm db:migrate                     # design_assets + reference_asset_id
+pnpm dev                            # upload on /concepts/:id
+
+# REST
+POST   /api/assets                  # multipart: file + optional conceptId
+GET    /api/assets/:id              # metadata JSON
+GET    /api/assets/:id/file?variant=thumb|card|full
+
+# Dev tooling (included on branch)
+pnpm db:studio                      # Drizzle Kit Studio</code></pre>
+    </section>
+  </article>
+</body>
+</html>
