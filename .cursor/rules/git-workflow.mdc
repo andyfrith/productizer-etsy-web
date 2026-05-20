@@ -17,7 +17,7 @@ Read `specs/git-workflow.html` and skill `productizer-git-workflow` when doing p
 ## Merging
 
 - All merges to `master` go through pull requests.
-- Run the phase `validation.html` automated gate before opening a PR.
+- Before opening/updating a PR, agent runs `./scripts/validate-p0.sh` (or phase script) and fixes all FAILs. Use skill `productizer-phase-validate`. Minimize manual user checks.
 - Do not force-push `master`.
 
 ## P0 (current)

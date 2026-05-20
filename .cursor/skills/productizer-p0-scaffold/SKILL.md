@@ -61,17 +61,17 @@ Do not delete or overwrite:
 
 ## Validation before PR
 
-Run the full automated gate from `validation.html`:
+Use skill **`productizer-phase-validate`**. Agent runs (do not ask user):
 
 ```bash
-docker compose up -d
-cp .env.example .env.local   # if missing
-pnpm install
-pnpm db:migrate
-pnpm lint && pnpm test && pnpm build && pnpm test:e2e
+chmod +x scripts/validate-p0.sh scripts/validate-lib.sh
+./scripts/validate-p0.sh          # after package.json exists
+# ./scripts/validate-p0.sh --tier docs   # before app scaffold
 ```
 
-Complete manual UX checks (accent, dark shell, Skeleton, DB error state).
+Script covers: git branch, secrets, docker, pnpm gate, curl home + `/api/health/db`, DB-down curl, CSS accent grep, Playwright via `test:e2e`.
+
+Encode UX in Playwright (`data-testid="db-status"`, title Productizer, skeleton). User only if Docker/ports blocked or merging PR.
 
 ## Out of scope
 

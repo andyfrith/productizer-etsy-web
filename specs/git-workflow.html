@@ -88,7 +88,7 @@ git branch --show-current   # → phase/0-scaffold</code></pre>
         <li><strong>One phase per PR</strong> — do not mix P0 scaffold with P1 concept CRUD in the same branch/PR.</li>
         <li><strong>Title:</strong> <code>phase(N): short description</code> — e.g. <code>phase(0): scaffold Next.js app and dev stack</code></li>
         <li><strong>Body:</strong> Copy checklist from <code>specs/…/validation.html</code>; link phase spec folder.</li>
-        <li><strong>Before open:</strong> Automated gate green; no secrets in diff.</li>
+        <li><strong>Before open:</strong> Agent runs <code>./scripts/validate-pN.sh</code> (exit 0); paste summary in PR; no secrets in diff.</li>
         <li><strong>After merge:</strong> Pull <code>master</code> locally before starting the next phase branch.</li>
       </ul>
     </section>

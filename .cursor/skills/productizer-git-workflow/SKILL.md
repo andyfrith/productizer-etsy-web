@@ -48,11 +48,12 @@ git checkout phase/N-slug      # existing
 
 ## Pull requests
 
-1. Push: `git push -u origin phase/N-slug`
-2. Title: `phase(N): short description`
-3. Body: checklist from `specs/…/validation.html`
-4. Target: `master`
-5. Do not merge until automated + manual validation complete.
+1. Agent runs `./scripts/validate-pN.sh` (exit 0) — see `productizer-phase-validate`
+2. Push: `git push -u origin phase/N-slug`
+3. Title: `phase(N): short description`
+4. Body: checklist from `specs/…/validation.html` + pasted script output
+5. Target: `master`
+6. User merges on GitHub after review (only manual step)
 
 ## Other branch types
 

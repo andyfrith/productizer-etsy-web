@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Validation Policy — Productizer Constitution</title>
+  <link rel="stylesheet" href="shared.css" />
+</head>
+<body class="wide">
+  <nav class="breadcrumb"><a href="index.html">Constitution</a> / Validation Policy</nav>
+  <article>
+    <h1>Validation Policy</h1>
+    <p class="lead">Every phase spec must be verifiable by an agent with minimal human intervention. Prefer scripts, <code>curl</code>, and Playwright over manual checklists.</p>
+
+    <section>
+      <h2>Hierarchy</h2>
+      <ol>
+        <li><strong>Shell script</strong> — <code>scripts/validate-pN.sh</code> (single command, exit code)</li>
+        <li><strong>curl / HTTP</strong> — APIs and HTML smoke</li>
+        <li><strong>Playwright</strong> — UX, a11y, branding (not human eyes)</li>
+        <li><strong>User</strong> — only environment blockers + GitHub merge</li>
+      </ol>
+    </section>
+
+    <section>
+      <h2>Phase validation.html template</h2>
+      <ul>
+        <li>Lead with agent script command</li>
+        <li>Table: check → automated method</li>
+        <li>“Manual” section ≤ 3 items (Docker down, ports, merge)</li>
+        <li>PR template includes pasted script output</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Skills</h2>
+      <ul>
+        <li><code>productizer-phase-validate</code> — run before PR</li>
+        <li><code>productizer-phase-spec</code> — write validation.html to this policy</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Scripts</h2>
+      <table>
+        <thead><tr><th>Phase</th><th>Script</th></tr></thead>
+        <tbody>
+          <tr><td>P0</td><td><code>./scripts/validate-p0.sh</code></td></tr>
+        </tbody>
+      </table>
+    </section>
+  </article>
+</body>
+</html>

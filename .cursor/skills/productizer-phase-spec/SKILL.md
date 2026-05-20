@@ -52,10 +52,14 @@ Before creating spec files, ensure branch `phase/{N}-{slug}` exists and is check
 
 ## validation.html
 
-- **Automated gate:** single copy-paste block (`lint`, `test`, `build`, `test:e2e`, `db:migrate`).
-- **Manual** UX and runtime checks.
-- Requirements traceability table.
-- **PR checklist** markdown block for copy into PR description.
+Follow `specs/validation-policy.html`. **Agent-first, minimal manual.**
+
+- **Step 1:** `./scripts/validate-pN.sh` (create script alongside spec).
+- **Table:** each check → script / curl / Playwright (not "user confirms").
+- **Manual section:** ≤ 3 items (Docker/ports blocked, GitHub merge only).
+- **Playwright:** encode former manual UX checks in `e2e/`.
+- **PR checklist:** agent pastes script PASS/FAIL summary.
+- Add `scripts/validate-pN.sh` using `scripts/validate-lib.sh` helpers.
 
 ## Do not
 

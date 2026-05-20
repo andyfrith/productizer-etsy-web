@@ -84,7 +84,10 @@ cp .env.example .env.local
 pnpm install
 pnpm db:migrate               # Drizzle applies initial schema
 pnpm dev                      # http://localhost:3000 — studio shell + DB health
-pnpm lint && pnpm test && pnpm build && pnpm test:e2e</code></pre>
+pnpm lint && pnpm test && pnpm build && pnpm test:e2e
+
+# Agent validation (run before PR)
+./scripts/validate-p0.sh</code></pre>
     </section>
   </article>
 </body>
