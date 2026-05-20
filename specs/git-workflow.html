@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Git Workflow — Productizer Constitution</title>
+  <link rel="stylesheet" href="shared.css" />
+</head>
+<body class="wide">
+  <nav class="breadcrumb"><a href="index.html">Constitution</a> / Git Workflow</nav>
+  <article>
+    <h1>Git Workflow</h1>
+    <p class="lead">
+      All phase work lands on dedicated branches and merges into <code>master</code> via pull requests. No direct commits to <code>master</code> for features, specs, or scaffolding.
+    </p>
+
+    <div class="decided">
+      <span class="label">Decided</span>
+      <ul style="margin:0.5rem 0 0 1.25rem">
+        <li>Integration branch: <strong><code>master</code></strong></li>
+        <li>Phase branches: <strong><code>phase/{N}-{slug}</code></strong> (one branch per roadmap phase deliverable)</li>
+        <li>Merge path: <strong>PR only</strong> (review + validation gate before merge)</li>
+      </ul>
+    </div>
+
+    <section>
+      <h2>Branch naming</h2>
+      <table>
+        <thead><tr><th>Pattern</th><th>When</th><th>Example</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><code>phase/{N}-{slug}</code></td>
+            <td>All work for roadmap phase N — specs, code, tests, README updates</td>
+            <td><code>phase/0-scaffold</code>, <code>phase/1-concept-crud</code></td>
+          </tr>
+          <tr>
+            <td><code>fix/{short-slug}</code></td>
+            <td>Urgent bugfix off <code>master</code> (not a full phase)</td>
+            <td><code>fix/db-health-500</code></td>
+          </tr>
+          <tr>
+            <td><code>chore/{short-slug}</code></td>
+            <td>Tooling/docs only, no product phase</td>
+            <td><code>chore/ci-playwright</code></td>
+          </tr>
+        </tbody>
+      </table>
+      <p style="font-size:0.85rem;color:var(--muted)">
+        <code>{N}</code> = roadmap phase number (0, 1, 2…). <code>{slug}</code> = kebab-case from phase title (e.g. scaffold, concept-crud, asset-upload).
+        Align with spec folder <code>specs/{YYYYMMDD}-phase{N}-{slug}/</code> when present.
+      </p>
+    </section>
+
+    <section>
+      <h2>Lifecycle (per phase)</h2>
+      <pre class="arch-diagram">master (protected integration)
+   │
+   ├─ git fetch origin && git checkout master && git pull
+   ├─ git checkout -b phase/N-slug
+   │
+   ├─ work: specs + implementation + tests
+   ├─ commits on phase/N-slug only
+   ├─ push: git push -u origin phase/N-slug
+   │
+   ├─ open PR → master
+   ├─ validation gate (see phase validation.html)
+   ├─ review / approve
+   └─ merge PR → delete branch (optional)</pre>
+    </section>
+
+    <section>
+      <h2>Starting a phase branch</h2>
+      <pre><code># From repo root — always branch from latest master
+git fetch origin
+git checkout master
+git pull origin master
+
+# P0 example
+git checkout -b phase/0-scaffold
+
+# Confirm
+git branch --show-current   # → phase/0-scaffold</code></pre>
+    </section>
+
+    <section>
+      <h2>Pull request rules</h2>
+      <ul>
+        <li><strong>One phase per PR</strong> — do not mix P0 scaffold with P1 concept CRUD in the same branch/PR.</li>
+        <li><strong>Title:</strong> <code>phase(N): short description</code> — e.g. <code>phase(0): scaffold Next.js app and dev stack</code></li>
+        <li><strong>Body:</strong> Copy checklist from <code>specs/…/validation.html</code>; link phase spec folder.</li>
+        <li><strong>Before open:</strong> Automated gate green; no secrets in diff.</li>
+        <li><strong>After merge:</strong> Pull <code>master</code> locally before starting the next phase branch.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>What not to do</h2>
+      <ul>
+        <li>Commit phase work directly on <code>master</code></li>
+        <li>Long-lived personal branches that bundle multiple phases</li>
+        <li>Force-push to <code>master</code></li>
+        <li>Merge without running the phase validation checklist</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Agent / Cursor</h2>
+      <p>Skills and rules enforce this workflow:</p>
+      <ul>
+        <li>Skill: <code>productizer-git-workflow</code></li>
+        <li>Rule: <code>.cursor/rules/git-workflow.mdc</code> (always apply)</li>
+      </ul>
+      <p style="font-size:0.85rem;color:var(--muted)">
+        Before creating or editing files for a phase, the agent must confirm the current branch is <code>phase/N-slug</code> or create/checkout that branch from <code>master</code>.
+      </p>
+    </section>
+
+    <section>
+      <h2>Current phase branches</h2>
+      <table>
+        <thead><tr><th>Phase</th><th>Branch</th><th>Spec folder</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>P0 Scaffold</td>
+            <td><code>phase/0-scaffold</code></td>
+            <td><a href="20260519-phase0-scaffold/index.html" style="color:var(--accent)">20260519-phase0-scaffold</a></td>
+            <td>Active — specs + implementation</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+  </article>
+</body>
+</html>

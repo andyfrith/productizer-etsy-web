@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Plan — P0 Scaffold</title>
+  <link rel="stylesheet" href="../shared.css" />
+</head>
+<body class="wide">
+  <nav class="breadcrumb">
+    <a href="../index.html">Constitution</a> /
+    <a href="index.html">P0 Scaffold</a> / Plan
+  </nav>
+  <article>
+    <h1>Implementation Plan — P0 Scaffold</h1>
+    <p class="lead">Ordered steps to implement requirements R0.1–R0.15. Each step should leave the repo in a runnable state.</p>
+
+    <div class="focus-now">
+      <strong>Branch:</strong> <code>phase/0-scaffold</code> (off <code>master</code>) · merge via PR only · <a href="../git-workflow.html" style="color:var(--accent)">Git workflow</a>
+    </div>
+
+    <div class="focus-now">
+      <strong>Agent skill:</strong> Use <code>productizer-p0-scaffold</code> + <code>productizer-git-workflow</code> when implementing in Cursor.
+    </div>
+
+    <section>
+      <h2>Step 0 — Branch from master</h2>
+      <pre><code>git fetch origin
+git checkout master && git pull origin master
+git checkout phase/0-scaffold 2>/dev/null || git checkout -b phase/0-scaffold
+git branch --show-current   # must print: phase/0-scaffold</code></pre>
+      <p style="font-size:0.85rem;color:var(--muted)">All commits for P0 (specs + app scaffold) stay on this branch until the PR merges.</p>
+    </section>
+
+    <section>
+      <h2>Step 1 — Toolchain &amp; Next.js app</h2>
+      <ol>
+        <li>Add <code>.nvmrc</code> with <code>22</code> and <code>packageManager</code> in <code>package.json</code>.</li>
+        <li>Scaffold Next.js in repo root (existing files preserved):
+          <pre><code>pnpm create next-app@latest . --typescript --tailwind --eslint --app --src-dir --import-alias "@/*"
+# If prompted about overwriting, merge carefully — keep README, docker-compose, specs/</code></pre>
+        </li>
+        <li>Verify <code>pnpm dev</code> serves default page.</li>
+      </ol>
+    </section>
+
+    <section>
+      <h2>Step 2 — shadcn/ui &amp; design tokens</h2>
+      <ol>
+        <li><code>pnpm dlx shadcn@latest init</code> — New York style, zinc/slate base, CSS variables.</li>
+        <li>Map accent to Etsy-adjacent orange in <code>globals.css</code> / theme (<code>--primary</code> ≈ <code>#f56400</code>).</li>
+        <li>Add components: <code>button</code>, <code>card</code>, <code>skeleton</code>, <code>sonner</code>.</li>
+        <li>Install <code>framer-motion</code>; wrap studio hero in a simple <code>motion.div</code> fade-in.</li>
+      </ol>
+    </section>
+
+    <section>
+      <h2>Step 3 — TanStack Query &amp; providers</h2>
+      <ol>
+        <li><code>pnpm add @tanstack/react-query</code></li>
+        <li>Create <code>src/app/providers.tsx</code> with <code>QueryClientProvider</code>.</li>
+        <li>Wire providers in root <code>layout.tsx</code>; add <code>&lt;Toaster /&gt;</code> from Sonner.</li>
+      </ol>
+    </section>
+
+    <section>
+      <h2>Step 4 — Docker &amp; env (verify)</h2>
+      <ol>
+        <li>Confirm <code>docker compose up -d</code> → Postgres healthy.</li>
+        <li><code>cp .env.example .env.local</code></li>
+        <li>Ensure <code>.gitignore</code> includes <code>.env.local</code>, <code>storage/</code>, <code>.next/</code>, <code>node_modules/</code>.</li>
+        <li>Ensure <code>storage/</code> directory is created at runtime if missing.</li>
+      </ol>
+    </section>
+
+    <section>
+      <h2>Step 5 — Drizzle ORM</h2>
+      <ol>
+        <li><code>pnpm add drizzle-orm postgres</code> · <code>pnpm add -D drizzle-kit</code></li>
+        <li><code>src/lib/db/index.ts</code> — client from <code>DATABASE_URL</code></li>
+        <li><code>drizzle.config.ts</code> at repo root</li>
+        <li>Initial schema: minimal table (e.g. <code>app_meta</code> key/value) or documented empty baseline for P1</li>
+        <li>Scripts: <code>db:generate</code>, <code>db:migrate</code></li>
+        <li>Run <code>pnpm db:migrate</code> against Compose Postgres</li>
+      </ol>
+    </section>
+
+    <section>
+      <h2>Step 6 — Studio shell &amp; DB health</h2>
+      <ol>
+        <li>Route group <code>src/app/(studio)/page.tsx</code> — Productizer home with Card, phase badge, Skeleton demo</li>
+        <li><code>src/app/api/health/db/route.ts</code> — returns JSON <code>{ ok: true }</code> or error</li>
+        <li>Client hook or server component fetch showing DB status on home</li>
+        <li>Redirect <code>/</code> → studio or make studio the root page</li>
+      </ol>
+    </section>
+
+    <section>
+      <h2>Step 7 — Lib stubs (P4+ prep)</h2>
+      <ol>
+        <li><code>pnpm add zod react-hook-form @hookform/resolvers</code></li>
+        <li><code>src/lib/schemas/concept.ts</code> — <code>conceptFormSchema</code> per tech-stack excerpt</li>
+        <li><code>pnpm add @tanstack/ai</code> (or current package name per docs)</li>
+        <li><code>src/lib/ai/types.ts</code>, <code>registry.ts</code> — interface + no-op stub provider</li>
+        <li>Optional: <code>src/components/mini-mock/MiniMock.tsx</code> static placeholder</li>
+      </ol>
+    </section>
+
+    <section>
+      <h2>Step 8 — Testing &amp; docs</h2>
+      <ol>
+        <li>Vitest: <code>pnpm add -D vitest @vitejs/plugin-react jsdom @testing-library/react @testing-library/jest-dom</code></li>
+        <li>One unit test under <code>tests/</code></li>
+        <li>Playwright: <code>pnpm create playwright</code> → <code>e2e/smoke.spec.ts</code></li>
+        <li>Document all scripts in README; run full validation gate (see <a href="validation.html" style="color:var(--accent)">validation.html</a>)</li>
+      </ol>
+    </section>
+
+    <section>
+      <h2>Package.json scripts (target)</h2>
+      <pre><code>{
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate"
+  }
+}</code></pre>
+    </section>
+
+    <section>
+      <h2>Risks &amp; mitigations</h2>
+      <table>
+        <thead><tr><th>Risk</th><th>Mitigation</th></tr></thead>
+        <tbody>
+          <tr><td><code>create next-app</code> overwrites repo files</td><td>Scaffold into temp dir and merge, or use flags + backup README/specs</td></tr>
+          <tr><td>Port 5432 in use</td><td>Document alternate port in compose override</td></tr>
+          <tr><td>Playwright needs running dev server</td><td><code>webServer</code> in playwright.config.ts</td></tr>
+          <tr><td>TanStack AI package rename</td><td>Pin version; note in PR if API differs from tech-stack excerpt</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>Definition of done</h2>
+      <p>All items in <a href="validation.html" style="color:var(--accent)">validation.html</a> checked — automated gate green and manual UX sign-off recorded in PR description.</p>
+    </section>
+
+    <p style="margin-top:2rem;font-size:0.85rem">
+      <a href="requirements.html" style="color:var(--accent)">← Requirements</a> ·
+      <a href="validation.html" style="color:var(--accent)">→ Validation</a>
+    </p>
+  </article>
+</body>
+</html>

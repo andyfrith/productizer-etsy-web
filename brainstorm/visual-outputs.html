@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Visual Outputs — Productizer Brainstorm</title>
+  <link rel="stylesheet" href="shared.css" />
+</head>
+<body class="wide">
+  <nav class="breadcrumb"><a href="index.html">Brainstorm</a> / Visual Docs Style</nav>
+  <article>
+
+    <div class="page-hero">
+      <div class="page-hero-visual">
+        <div class="mock-grid">
+          <div class="mini-mock mini-mock--listing" style="width:64px" aria-hidden="true"></div><div class="mini-mock mini-mock--poster" style="width:64px" aria-hidden="true"></div><div class="mini-mock mini-mock--export" style="width:64px" aria-hidden="true"></div>
+        </div>
+      </div>
+      <div class="page-hero-text">
+        <h1>Visual Brainstorm Docs</h1>
+        <p class="lead">These HTML pages use mini mockups, flow diagrams, and cards—not text-only walls. The Productizer app should follow the same principle.</p>
+      </div>
+    </div>
+
+    <div class="decided">
+      <span class="label">Style guide</span>
+      Every brainstorm page: page hero + diagrams where helpful. Tables include a visual column when possible.
+    </div>
+
+    <section>
+      <h2>Doc components (shared.css)</h2>
+      <div class="module-grid">
+        <div class="module-tile"><span style="font-size:1.5rem">▦</span><strong>mock-grid</strong></div>
+        <div class="module-tile"><span style="font-size:1.5rem">→</span><strong>flow-pipeline</strong></div>
+        <div class="module-tile"><span style="font-size:1.5rem">👤</span><strong>persona-card</strong></div>
+        <div class="module-tile"><span style="font-size:1.5rem">📋</span><strong>phase-timeline</strong></div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Product type mini mocks</h2>
+      <div class="mock-grid">
+        <div class="mock-card"><div class="mini-mock mini-mock--poster" aria-hidden="true"></div><span>Poster</span></div>
+        <div class="mock-card"><div class="mini-mock mini-mock--sign" aria-hidden="true"></div><span>Sign</span></div>
+        <div class="mock-card"><div class="mini-mock mini-mock--tumbler" aria-hidden="true"></div><span>Tumbler</span></div>
+        <div class="mock-card"><div class="mini-mock mini-mock--shirt" aria-hidden="true"></div><span>T-shirt</span></div>
+        <div class="mock-card"><div class="mini-mock mini-mock--planner" aria-hidden="true"></div><span>Planner</span></div>
+        <div class="mock-card"><div class="mini-mock mini-mock--listing" aria-hidden="true"></div><span>Listing</span></div>
+      </div>
+    </section>
+
+    <section>
+      <h2>App surfaces (same visual language)</h2>
+      <table>
+        <thead><tr><th></th><th>Surface</th><th>Mini mock</th></tr></thead>
+        <tbody>
+          <tr><td class="visual-cell"><div class="mini-mock mini-mock--niche" style="width:40px" aria-hidden="true"></div></td><td>Niche picker</td><td>Mood / example strip</td></tr>
+          <tr><td class="visual-cell"><div class="mini-mock mini-mock--variations" style="width:40px" aria-hidden="true"></div></td><td>Variation gallery</td><td>Thumb grid</td></tr>
+          <tr><td class="visual-cell"><div class="mini-mock mini-mock--export" style="width:40px" aria-hidden="true"></div></td><td>Export pack</td><td>Folder preview</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+  </article>
+</body>
+</html>

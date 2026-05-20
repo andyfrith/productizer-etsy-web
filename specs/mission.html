@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mission — Productizer Constitution</title>
+  <link rel="stylesheet" href="shared.css" />
+</head>
+<body class="wide">
+  <nav class="breadcrumb"><a href="index.html">Constitution</a> / Mission</nav>
+  <article>
+
+    <div class="page-hero">
+      <div class="page-hero-visual">
+        <div class="flow-pipeline">
+          <div class="mini-mock mini-mock--concept" style="width:44px" aria-hidden="true"></div><span style="color:var(--muted);font-size:0.7rem">NOW</span>
+          <div class="mini-mock mini-mock--variations" style="width:44px" aria-hidden="true"></div>
+          <div class="mini-mock mini-mock--poster" style="width:44px" aria-hidden="true"></div>
+          <span class="flow-arrow">→</span>
+          <div class="mini-mock mini-mock--listing" style="width:44px" aria-hidden="true"></div>
+          <span style="color:var(--muted);font-size:0.7rem">LATER</span>
+        </div>
+      </div>
+      <div class="page-hero-text">
+        <h1>Mission</h1>
+        <p class="lead">Help Etsy sellers turn design ideas into listing-ready POD products—starting with concepts, not market research.</p>
+      </div>
+    </div>
+
+    <div class="focus-now">
+      <strong>Current focus (initial phases):</strong> <em>Design concept creation &amp; management</em>—the Image Generator module:
+      create, store, branch variations, composite onto product mocks, approve assets. Niche is a <strong>light label</strong> on concepts for now, not a research platform.
+    </div>
+
+    <section>
+      <h2>Vision</h2>
+      <blockquote>
+        Productizer is a product creation platform for niche-oriented print-on-demand and (later) digital listings on Etsy.
+        Sellers move from a design concept to approved mocks and exportable assets in one workspace—with AI-assisted variation where it helps.
+      </blockquote>
+    </section>
+
+    <section>
+      <h2>What we build first</h2>
+      <div class="module-grid">
+        <div class="module-tile"><div class="mini-mock mini-mock--concept" style="width:48px" aria-hidden="true"></div><strong>Design concepts</strong><span>Brief, style, prompts</span></div>
+        <div class="module-tile"><div class="mini-mock mini-mock--variations" style="width:48px" aria-hidden="true"></div><strong>Variations</strong><span>Branch &amp; compare</span></div>
+        <div class="module-tile"><div class="mini-mock mini-mock--ai" style="width:48px" aria-hidden="true"></div><strong>Generation</strong><span>Provider abstraction</span></div>
+        <div class="module-tile"><div class="mini-mock mini-mock--poster" style="width:48px" aria-hidden="true"></div><strong>Product mocks</strong><span>POD templates</span></div>
+        <div class="module-tile"><div class="mini-mock mini-mock--export" style="width:48px" aria-hidden="true"></div><strong>Asset library</strong><span>Thumb / card / full</span></div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Explicitly later</h2>
+      <div class="deferred">
+        <strong>Niche Research Module (future)</strong> — marketing research, market segments, niche / sub-niche / cross-niche discovery,
+        competitive positioning, and curated niche libraries. README references this; it is <em>not</em> in scope for initial phases.
+      </div>
+      <div class="deferred">
+        <strong>Listing Studio &amp; Etsy Bridge</strong> — listing copy, tags, OAuth, drafts—after concept + mock workflow is solid.
+      </div>
+      <div class="deferred">
+        <strong>Wave 2 products</strong> — digital planners &amp; printables (different fulfillment and listing flow).
+      </div>
+    </section>
+
+    <section>
+      <h2>Product scope (decided)</h2>
+      <div class="mock-grid">
+        <div class="mock-card"><div class="mini-mock mini-mock--poster" style="width:48px" aria-hidden="true"></div><span>Poster / art print</span></div>
+        <div class="mock-card"><div class="mini-mock mini-mock--sign" style="width:48px" aria-hidden="true"></div><span>Signs</span></div>
+        <div class="mock-card"><div class="mini-mock mini-mock--tumbler" style="width:48px" aria-hidden="true"></div><span>Tumblers</span></div>
+        <div class="mock-card"><div class="mini-mock mini-mock--shirt" style="width:48px" aria-hidden="true"></div><span>T-shirts</span></div>
+        <div class="mock-card"><div class="mini-mock mini-mock--planner" style="width:48px" aria-hidden="true"></div><span>Planners (wave 2)</span></div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Principles</h2>
+      <ul>
+        <li><strong>Visual-first</strong> — lists, galleries, exports use mini mockups and thumbnails.</li>
+        <li><strong>Polished UX</strong> — shadcn/ui, thoughtful motion (Framer Motion), loading/empty/error states; studio-grade feel throughout.</li>
+        <li><strong>Concept lineage</strong> — every variation and mock traces back to a concept.</li>
+        <li><strong>One product type per phase</strong> — add poster → sign → tumbler → shirt incrementally.</li>
+        <li><strong>Local-first via Docker Compose</strong> — Postgres in containers, Next.js on host; production hosting undecided.</li>
+        <li><strong>Tested flows</strong> — Vitest for logic; Playwright E2E for critical concept → mock paths.</li>
+      </ul>
+      <p style="font-size:0.9rem;color:var(--muted)">Stack detail: <a href="tech-stack.html" style="color:var(--accent)">tech-stack.html</a></p>
+    </section>
+
+    <section>
+      <h2>Success (initial phases)</h2>
+      <ul>
+        <li>Create a concept, generate or upload variations, approve one, see it on a poster mock—without leaving Productizer.</li>
+        <li>All assets stored locally with thumb/card/full renditions for UI and export preview.</li>
+        <li>Time from new concept → first approved mock &lt; 30 minutes (manual or AI path).</li>
+      </ul>
+    </section>
+
+  </article>
+</body>
+</html>

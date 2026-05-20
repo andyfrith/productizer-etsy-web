@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Validation — P0 Scaffold</title>
+  <link rel="stylesheet" href="../shared.css" />
+  <style>
+    .checklist { list-style: none; margin-left: 0; padding: 0; }
+    .checklist li {
+      padding: 0.5rem 0.75rem;
+      margin-bottom: 0.35rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 0.9rem;
+    }
+    .checklist li::before { content: "☐ "; color: var(--muted); }
+    .checklist--auto li::before { content: "⚙ "; color: var(--accent); }
+    .checklist--manual li::before { content: "👁 "; color: var(--idea); }
+    .gate-ok {
+      border-left: 3px solid var(--idea);
+      background: rgba(61, 154, 106, 0.1);
+      padding: 1rem;
+      border-radius: 0 8px 8px 0;
+      margin: 1rem 0;
+    }
+  </style>
+</head>
+<body class="wide">
+  <nav class="breadcrumb">
+    <a href="../index.html">Constitution</a> /
+    <a href="index.html">P0 Scaffold</a> / Validation
+  </nav>
+  <article>
+    <h1>Validation — P0 Scaffold</h1>
+    <p class="lead">
+      Use this page before opening a PR. <strong>Automated gate</strong> must pass in CI or locally; <strong>manual checks</strong> confirm UX and developer experience.
+    </p>
+
+    <div class="gate-ok">
+      <strong>PR-ready when:</strong> Branch is <code>phase/0-scaffold</code>, automated gate passes, manual checks done, requirements traced in PR, no secrets in diff. Merge via PR to <code>master</code> only (<a href="../git-workflow.html" style="color:var(--accent)">git workflow</a>).
+    </div>
+
+    <section>
+      <h2>Git branch</h2>
+      <pre><code>git branch --show-current    # → phase/0-scaffold
+git log master..HEAD --oneline   # commits not yet on master</code></pre>
+      <ul class="checklist checklist--manual">
+        <li>All work committed on <code>phase/0-scaffold</code>, not <code>master</code></li>
+        <li>Branch was created from latest <code>master</code></li>
+        <li>PR targets <code>master</code> (not another feature branch)</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Environment setup (once per machine)</h2>
+      <pre><code>node -v          # v22.x
+pnpm -v
+docker compose version
+cp .env.example .env.local
+docker compose up -d
+docker compose ps   # postgres healthy</code></pre>
+    </section>
+
+    <section>
+      <h2>Automated gate</h2>
+      <p style="font-size:0.9rem;color:var(--muted);margin-bottom:0.75rem">Run from repo root after <code>pnpm install</code>:</p>
+      <pre><code>pnpm db:migrate
+pnpm lint
+pnpm test
+pnpm build
+pnpm test:e2e</code></pre>
+      <ul class="checklist checklist--auto">
+        <li><code>pnpm db:migrate</code> — migrations apply cleanly against Compose Postgres</li>
+        <li><code>pnpm lint</code> — zero errors</li>
+        <li><code>pnpm test</code> — all Vitest tests pass</li>
+        <li><code>pnpm build</code> — production build succeeds</li>
+        <li><code>pnpm test:e2e</code> — Playwright smoke passes (dev server via webServer config)</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Runtime smoke (manual commands)</h2>
+      <pre><code>pnpm dev
+# separate terminal:
+curl -s http://localhost:3000/api/health/db | jq .
+curl -s -o /dev/null -w "%{http_code}" http://localhost:3000/</code></pre>
+      <ul class="checklist checklist--manual">
+        <li>Studio home loads at <code>http://localhost:3000</code></li>
+        <li>DB health endpoint returns <code>ok: true</code> (or documented error when DB down)</li>
+        <li>Stopping Postgres (<code>docker compose stop</code>) shows graceful error state on home (not a blank crash)</li>
+        <li><code>storage/</code> exists or is created; not tracked by git</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Manual UX &amp; design checks</h2>
+      <ul class="checklist checklist--manual">
+        <li>Accent color reads as Etsy-adjacent orange on primary actions</li>
+        <li>Dark studio shell feels consistent with constitution / brainstorm aesthetic</li>
+        <li>Card layout on home is polished (spacing, typography, not default Next.js template)</li>
+        <li>Skeleton loading state visible during DB check (or brief demo)</li>
+        <li>Sonner toast can be triggered (dev-only button or documented test) — optional but recommended</li>
+        <li>Framer Motion entrance is subtle, not distracting</li>
+        <li>Keyboard focus visible on interactive elements</li>
+        <li>Page title and meta reflect “Productizer” branding</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Requirements traceability</h2>
+      <table>
+        <thead><tr><th>Req</th><th>How to verify</th></tr></thead>
+        <tbody>
+          <tr><td>R0.1</td><td><code>pnpm dev</code>, TypeScript build in <code>pnpm build</code></td></tr>
+          <tr><td>R0.2</td><td>shadcn components render; theme accent in DevTools</td></tr>
+          <tr><td>R0.3</td><td>React Query Devtools or network tab shows query on home</td></tr>
+          <tr><td>R0.4–R0.5</td><td><code>db:migrate</code> + health API</td></tr>
+          <tr><td>R0.6</td><td><code>storage/</code> gitignored</td></tr>
+          <tr><td>R0.7–R0.8</td><td>Studio home + motion</td></tr>
+          <tr><td>R0.9–R0.10</td><td>Files exist under <code>lib/schemas</code>, <code>lib/ai</code></td></tr>
+          <tr><td>R0.11–R0.12</td><td><code>pnpm test</code>, <code>pnpm test:e2e</code></td></tr>
+          <tr><td>R0.13–R0.15</td><td>package.json scripts + README</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>PR checklist (copy into description)</h2>
+      <pre><code>## Phase P0 — Scaffold
+
+**Branch:** `phase/0-scaffold` → `master`
+
+- [ ] Git: all commits on phase/0-scaffold; PR targets master
+- [ ] Automated gate: db:migrate, lint, test, build, test:e2e
+- [ ] Manual: studio home, DB health, error state when DB down
+- [ ] Manual: design tokens / UX polish per validation.html
+- [ ] README setup steps verified on clean clone
+- [ ] No secrets in diff (.env.local not committed)
+- [ ] Spec: specs/20260519-phase0-scaffold/
+
+Closes / implements: P0 (roadmap)</code></pre>
+    </section>
+
+    <section>
+      <h2>Out of scope verification</h2>
+      <p style="font-size:0.9rem;color:var(--muted)">Confirm the PR does <strong>not</strong> claim to deliver:</p>
+      <ul>
+        <li>Concept CRUD, uploads, variations, AI generation, poster mock</li>
+        <li>Auth or Etsy integration</li>
+      </ul>
+    </section>
+
+    <p style="margin-top:2rem;font-size:0.85rem">
+      <a href="plan.html" style="color:var(--accent)">← Plan</a> ·
+      <a href="requirements.html" style="color:var(--accent)">← Requirements</a>
+    </p>
+  </article>
+</body>
+</html>
