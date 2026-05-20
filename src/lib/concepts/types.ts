@@ -9,6 +9,7 @@ export interface ConceptDto {
   campaignLabel: string | null;
   styleNotes: string | null;
   status: ConceptStatus;
+  previewAssetId: string | null;
   createdAt: string;
   updatedAt: string;
 }

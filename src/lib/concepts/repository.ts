@@ -1,4 +1,5 @@
 import { and, desc, eq, ne } from "drizzle-orm";
+import { getAssetById } from "@/lib/assets/repository";
 import { designConcepts } from "@/lib/db/schema";
 import { getDb } from "@/lib/db";
 import type { ConceptDto, ConceptStatus } from "@/lib/concepts/types";
@@ -17,6 +18,7 @@ export function mapConceptRow(row: ConceptRow): ConceptDto {
     campaignLabel: row.campaignLabel,
     styleNotes: row.styleNotes,
     status: row.status as ConceptStatus,
+    previewAssetId: row.previewAssetId,
     createdAt: row.createdAt.toISOString(),
     updatedAt: row.updatedAt.toISOString(),
   };
@@ -108,6 +110,31 @@ export async function updateConcept(
     .update(designConcepts)
     .set(patch)
     .where(and(eq(designConcepts.id, id), ne(designConcepts.status, "archived")))
+    .returning();
+
+  return row ? mapConceptRow(row) : null;
+}
+
+/**
+ * Sets which reference asset is the concept preview (must belong to the concept).
+ */
+export async function setConceptPreviewAsset(
+  conceptId: string,
+  assetId: string,
+): Promise<ConceptDto | null> {
+  const asset = await getAssetById(assetId);
+
+  if (!asset || asset.conceptId !== conceptId || asset.archivedAt !== null) {
+    return null;
+  }
+
+  const db = getDb();
+  const [row] = await db
+    .update(designConcepts)
+    .set({ previewAssetId: assetId, updatedAt: new Date() })
+    .where(
+      and(eq(designConcepts.id, conceptId), ne(designConcepts.status, "archived")),
+    )
     .returning();
 
   return row ? mapConceptRow(row) : null;

@@ -20,7 +20,7 @@ import { DbStatus } from "@/components/studio/db-status";
 export default function StudioHomePage() {
   return (
     <div className="flex flex-1 flex-col">
-      <StudioHeader phaseLabel="Phase P1" />
+      <StudioHeader phaseLabel="Phase P2" />
 
       <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-6 px-6 py-10">
         <Card>

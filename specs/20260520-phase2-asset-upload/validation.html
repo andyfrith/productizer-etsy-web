@@ -83,7 +83,18 @@ curl -s http://localhost:3000/api/assets/ASSET_ID | jq .
 
 # Serve card rendition
 curl -s -o /dev/null -w "HTTP %{http_code}\n" \
-  "http://localhost:3000/api/assets/ASSET_ID/file?variant=card"</code></pre>
+  "http://localhost:3000/api/assets/ASSET_ID/file?variant=card"
+
+# List references for a concept
+curl -s "http://localhost:3000/api/concepts/CONCEPT_ID/references" | jq .
+
+# Set preview image
+curl -s -X PUT "http://localhost:3000/api/concepts/CONCEPT_ID/preview" \
+  -H "Content-Type: application/json" \
+  -d '{"assetId":"ASSET_ID"}' | jq .
+
+# Remove one reference
+curl -s -X DELETE "http://localhost:3000/api/assets/ASSET_ID?conceptId=CONCEPT_ID" | jq .</code></pre>
     </section>
 
     <section>
@@ -92,9 +103,10 @@ curl -s -o /dev/null -w "HTTP %{http_code}\n" \
       <ul class="checklist checklist--agent">
         <li>Create concept via UI or API fixture</li>
         <li>Open <code>/concepts/:id</code> — upload control visible (<code>data-testid="asset-upload"</code>)</li>
-        <li>Set file input to <code>e2e/fixtures/sample.png</code> — submit upload</li>
-        <li>Preview image visible (<code>data-testid="asset-preview"</code>)</li>
-        <li>Success toast or stable preview after reload</li>
+        <li>Set file input — pending preview (<code>asset-preview-local</code>, <code>data-reference-kind="pending"</code>)</li>
+        <li>Remove pending — Undo toast restores <code>asset-preview-local</code></li>
+        <li>Upload — saved preview; remove saved — Undo toast restores via <code>PUT …/reference</code></li>
+        <li>Success toast or stable state after each action</li>
       </ul>
     </section>
 

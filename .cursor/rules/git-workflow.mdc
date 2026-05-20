@@ -24,3 +24,12 @@ Read `specs/git-workflow.html` and skill `productizer-git-workflow` when doing p
 
 - Branch: `phase/2-asset-upload`
 - Spec: `specs/20260520-phase2-asset-upload/`
+
+## In-phase drop-in requests
+
+When the user requests a change during the **current** phase (UX tweak, extra acceptance criterion, etc.):
+
+1. Update that phase’s `specs/…-phaseN-slug/` (`requirements.html`, `validation.html`, `plan.html`/`index.html` as needed) in the **same** work session as the code.
+2. Add a row to **Phase amendments** in `requirements.html`.
+3. Follow `specs/validation-policy.html#in-phase-amendments` and `productizer-phase-spec`.
+4. Do not expand into the next roadmap phase without explicit approval.

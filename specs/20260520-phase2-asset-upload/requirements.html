@@ -30,7 +30,7 @@
     <section>
       <h2>Goal</h2>
       <p>
-        A user can upload a reference image for a design concept from the concept detail page. The server stores three renditions on disk under <code>STORAGE_ROOT</code> and records metadata in Postgres. The UI shows a preview (card or thumb) after upload.
+        A user can upload multiple reference images for a design concept from the concept detail page. The server stores three renditions per image under <code>STORAGE_ROOT</code> and records metadata in Postgres. The user chooses one reference as the <strong>preview</strong> image (gallery thumb and primary tile).
       </p>
     </section>
 
@@ -57,7 +57,7 @@
           <tr>
             <td><code>R2.2</code></td>
             <td>Concept reference link</td>
-            <td><code>design_concepts.reference_asset_id</code> (uuid, nullable FK → <code>design_assets.id</code>); set when upload includes <code>conceptId</code></td>
+            <td><code>design_concepts.preview_asset_id</code> (uuid, nullable FK → <code>design_assets.id</code>); user-selected preview among references; first upload auto-sets preview when none</td>
           </tr>
           <tr>
             <td><code>R2.3</code></td>
@@ -82,7 +82,7 @@
           <tr>
             <td><code>R2.7</code></td>
             <td>Upload UI</td>
-            <td>Concept detail <code>/concepts/[id]</code>: file input + upload button; shows thumb/card preview when <code>reference_asset_id</code> set; loading and error states; Sonner toast on success/failure</td>
+            <td>Concept detail: <strong>reference gallery</strong> (<code>GET /api/concepts/:id/references</code>) with multiple saved tiles; one marked <strong>Preview</strong> (<code>asset-preview</code>, primary ring); others <code>asset-reference-card</code> with <strong>Set as preview</strong> (<code>PUT /api/concepts/:id/preview</code>); pending local tile (dashed amber); remove pending (local undo) or saved (deferred delete + undo); upload adds to library without replacing others</td>
           </tr>
           <tr>
             <td><code>R2.8</code></td>
@@ -102,7 +102,7 @@
           <tr>
             <td><code>R2.11</code></td>
             <td>E2E upload</td>
-            <td>Playwright <code>e2e/asset-upload.spec.ts</code>: create concept → upload fixture image → preview visible on detail</td>
+            <td>Playwright <code>e2e/asset-upload.spec.ts</code>: upload flow; remove pending/saved with Undo toast restoring preview</td>
           </tr>
           <tr>
             <td><code>R2.12</code></td>
@@ -121,7 +121,7 @@
           <tr>
             <td><code>R2.S1</code></td>
             <td>Replace reference</td>
-            <td>Uploading again for same concept updates <code>reference_asset_id</code> (old asset row may remain or be orphaned—document choice in PR)</td>
+            <td>Additional uploads append to the reference library; preview changes only via <strong>Set as preview</strong> or first-upload default</td>
           </tr>
           <tr>
             <td><code>R2.S2</code></td>
@@ -170,7 +170,45 @@ storage/                          # gitignored (runtime)</code></pre>
         <li>Drag-and-drop or clear “Upload reference” affordance on concept detail</li>
         <li>Skeleton/placeholder while image loads</li>
         <li>Accessible file input label; error message for invalid type/size</li>
+        <li>Labeled preview tiles: “Current reference” vs “Selected (upload to save)” / “New selection (upload to replace)”</li>
       </ul>
+    </section>
+
+    <section id="phase-amendments">
+      <h2>Phase amendments (in-branch drop-ins)</h2>
+      <p style="font-size:0.9rem;color:var(--muted)">
+        Scope changes requested during implementation on <code>phase/2-asset-upload</code>. See <a href="../validation-policy.html#in-phase-amendments" style="color:var(--link)">Validation Policy — in-phase amendments</a>.
+      </p>
+      <table>
+        <thead><tr><th>Date</th><th>Change</th><th>Spec / code</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>2026-05-20</td>
+            <td><strong>Pre-upload local preview</strong> — selected file appears in the reference image area immediately; existing uploaded reference stays visible alongside pending selection until upload completes.</td>
+            <td><code>R2.7</code>, <code>R2.11</code>; <code>asset-upload.tsx</code>; <code>asset-preview-local</code> in E2E</td>
+          </tr>
+          <tr>
+            <td>2026-05-20</td>
+            <td><strong>Pending vs saved distinction + remove</strong> — pending previews use dashed amber styling and “Not uploaded” badge; saved use solid border and “Saved” badge; Remove clears pending selection or calls <code>DELETE /api/concepts/:id/reference</code> for saved.</td>
+            <td><code>R2.7</code>, <code>R2.11</code>; <code>reference/route.ts</code>; <code>useClearReferenceAsset</code>; E2E remove specs</td>
+          </tr>
+          <tr>
+            <td>2026-05-20</td>
+            <td><strong>Undo on remove</strong> — Sonner toast with Undo (8s); pending undo restores selection; saved undo cancels deferred delete.</td>
+            <td><code>R2.7</code>, <code>R2.11</code>; E2E undo specs</td>
+          </tr>
+          <tr>
+            <td>2026-05-20</td>
+            <td><strong>Multiple references + preview pick</strong> — many <code>design_assets</code> per concept; <code>preview_asset_id</code> chooses gallery/detail preview; rename from <code>reference_asset_id</code>.</td>
+            <td><code>R2.2</code>, <code>R2.7</code>; migration <code>0003</code>; <code>references</code> + <code>preview</code> API; <code>use-reference-assets.ts</code></td>
+          </tr>
+          <tr>
+            <td>2026-05-20</td>
+            <td><strong>Archive + permanent delete</strong> — Remove from Active archives (<code>archived_at</code>); <strong>Archived</strong> view lists archived only; select + confirm dialog for <code>DELETE ?permanent=true</code>; undo restores from archive.</td>
+            <td><code>archived_at</code> migration <code>0004</code>; <code>?archived=true</code> on references list; E2E archived flow</td>
+          </tr>
+        </tbody>
+      </table>
     </section>
   </article>
 </body>

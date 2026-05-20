@@ -13,6 +13,7 @@ describe("mapConceptRow", () => {
       campaignLabel: "cottagecore",
       styleNotes: null,
       status: "draft",
+      previewAssetId: null,
       createdAt: created,
       updatedAt: updated,
     });
@@ -24,6 +25,7 @@ describe("mapConceptRow", () => {
       campaignLabel: "cottagecore",
       styleNotes: null,
       status: "draft",
+      previewAssetId: null,
       createdAt: created.toISOString(),
       updatedAt: updated.toISOString(),
     });

@@ -90,7 +90,9 @@ P2_FILES=(
   "src/app/api/assets/[id]/route.ts"
   "src/app/api/assets/[id]/file/route.ts"
   "src/components/assets/asset-upload.tsx"
-  "src/hooks/use-upload-asset.ts"
+  "src/hooks/use-reference-assets.ts"
+  "src/app/api/concepts/[id]/references/route.ts"
+  "src/app/api/concepts/[id]/preview/route.ts"
   "e2e/asset-upload.spec.ts"
   "e2e/fixtures/sample.png"
 )
@@ -105,10 +107,10 @@ else
   fail "schema missing design_assets / designAssets"
 fi
 
-if grep -q "reference_asset_id\|referenceAssetId" src/lib/db/schema.ts 2>/dev/null; then
-  pass "schema references reference_asset_id on concepts"
+if grep -q "preview_asset_id\|previewAssetId" src/lib/db/schema.ts 2>/dev/null; then
+  pass "schema references preview_asset_id on concepts"
 else
-  fail "schema missing reference_asset_id / referenceAssetId"
+  fail "schema missing preview_asset_id / previewAssetId"
 fi
 
 if ls drizzle/*.sql 2>/dev/null | xargs grep -l "design_assets" >/dev/null 2>&1; then
@@ -220,15 +222,17 @@ if [[ -n "$CONCEPT_ID" && -f "$FIXTURE" ]]; then
     curl_http_status "http://localhost:3000/api/assets/$ASSET_ID/file?variant=card" "200"
 
     DETAIL_BODY="$(curl -sf "http://localhost:3000/api/concepts/$CONCEPT_ID" 2>/dev/null)" || DETAIL_BODY=""
-    if echo "$DETAIL_BODY" | grep -qE '"referenceAssetId"[[:space:]]*:[[:space:]]*"' 2>/dev/null; then
+    if echo "$DETAIL_BODY" | grep -qE '"previewAssetId"[[:space:]]*:[[:space:]]*"' 2>/dev/null; then
       if echo "$DETAIL_BODY" | grep -qF "$ASSET_ID"; then
-        pass "GET /api/concepts/:id includes referenceAssetId"
+        pass "GET /api/concepts/:id includes previewAssetId (first upload)"
       else
-        fail "concept detail referenceAssetId does not match uploaded asset"
+        fail "concept detail previewAssetId does not match first uploaded asset"
       fi
     else
-      fail "GET /api/concepts/:id missing referenceAssetId after upload"
+      fail "GET /api/concepts/:id missing previewAssetId after first upload"
     fi
+
+    curl_http_status "http://localhost:3000/api/concepts/$CONCEPT_ID/references" "200"
   fi
 else
   fail "skipped asset upload curl (missing concept id or $FIXTURE)"

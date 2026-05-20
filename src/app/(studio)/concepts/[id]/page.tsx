@@ -23,6 +23,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { AssetUpload } from "@/components/assets/asset-upload";
 import { ConceptForm } from "@/components/concepts/concept-form";
 import { StudioHeader } from "@/components/studio/studio-header";
 import {
@@ -57,7 +58,7 @@ export default function ConceptDetailPage({ params }: PageProps) {
 
   return (
     <div className="flex flex-1 flex-col">
-      <StudioHeader phaseLabel="Phase P1" subtitle="Concept detail" />
+      <StudioHeader phaseLabel="Phase P2" subtitle="Concept detail" />
 
       <main className="mx-auto w-full max-w-2xl flex-1 px-6 py-10">
         <Link
@@ -85,6 +86,11 @@ export default function ConceptDetailPage({ params }: PageProps) {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
+              <AssetUpload
+                conceptId={concept.id}
+                previewAssetId={concept.previewAssetId}
+              />
+
               <ConceptForm
                 key={concept.updatedAt}
                 defaultValues={{

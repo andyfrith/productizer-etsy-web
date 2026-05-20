@@ -91,6 +91,8 @@ chmod +x scripts/validate-p2.sh scripts/validate-lib.sh
 
 Spec: `specs/20260520-phase2-asset-upload/validation.html`
 
+After in-phase drop-ins, confirm `requirements.html` Phase amendments and `validation.html` match implemented behavior (`specs/validation-policy.html#in-phase-amendments`).
+
 ## Playwright UX coverage (P0)
 
 E2E specs should assert (so humans don't):

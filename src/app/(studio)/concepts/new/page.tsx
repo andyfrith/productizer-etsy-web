@@ -28,7 +28,7 @@ export default function NewConceptPage() {
 
   return (
     <div className="flex flex-1 flex-col">
-      <StudioHeader phaseLabel="Phase P1" subtitle="New concept" />
+      <StudioHeader phaseLabel="Phase P2" subtitle="New concept" />
 
       <main className="mx-auto w-full max-w-2xl flex-1 px-6 py-10">
         <Link

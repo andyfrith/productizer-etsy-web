@@ -83,6 +83,18 @@ git branch --show-current   # → phase/0-scaffold</code></pre>
     </section>
 
     <section>
+      <h2>In-phase drop-in requests</h2>
+      <p style="font-size:0.9rem;color:var(--muted)">
+        Small additions during an active phase (same branch, same PR scope) must update that phase’s spec folder—not only application code. See <a href="validation-policy.html#in-phase-amendments" style="color:var(--link)">Validation Policy — in-phase amendments</a>.
+      </p>
+      <ul>
+        <li><code>requirements.html</code> — acceptance criteria + <strong>Phase amendments</strong> table</li>
+        <li><code>validation.html</code> and E2E/<code>data-testid</code> when behavior is testable</li>
+        <li>Phase skill (e.g. <code>productizer-p2-asset-upload</code>) when agents need the delta</li>
+      </ul>
+    </section>
+
+    <section>
       <h2>Pull request rules</h2>
       <ul>
         <li><strong>One phase per PR</strong> — do not mix P0 scaffold with P1 concept CRUD in the same branch/PR.</li>
