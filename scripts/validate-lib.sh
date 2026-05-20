@@ -45,6 +45,10 @@ require_cmd() {
 
 assert_branch() {
   local expected="$1"
+  if [[ "${GITHUB_ACTIONS:-}" == "true" ]]; then
+    pass "git branch check skipped in CI (detached HEAD)"
+    return 0
+  fi
   local current
   current="$(git branch --show-current 2>/dev/null || true)"
   if [[ "$current" == "$expected" ]]; then

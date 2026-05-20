@@ -13,6 +13,6 @@ test.describe("studio home smoke", () => {
 
     await expect(page.getByTestId("db-status")).toBeVisible();
     await expect(page.getByTestId("skeleton-demo")).toBeVisible();
-    await expect(page.getByText("Phase P0")).toBeVisible();
+    await expect(page.getByText("Phase P1")).toBeVisible();
   });
 });

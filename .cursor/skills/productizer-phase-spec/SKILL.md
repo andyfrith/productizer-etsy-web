@@ -21,13 +21,16 @@ specs/{YYYYMMDD}-phase{N}-{slug}/
 
 - **Date:** `YYYYMMDD` (user may omit dashes; follow their explicit choice).
 - **Slug:** lowercase, hyphenated (e.g. `phase0-scaffold`, `phase1-concept-crud`).
-- **Styles:** Link `../shared.css` from phase HTML files.
+- **Styles:** Link `../shared.css` from phase HTML files (light, text-first; see `brainstorm/visual-outputs.html`).
+- **LLM clarity:** Add `doc-context` block at top of each article; use tables and `pre.text-flow` instead of mini-mock decorations.
 
 ## Git branch (required)
 
 Before creating spec files, ensure branch `phase/{N}-{slug}` exists and is checked out. See `productizer-git-workflow` and `specs/git-workflow.html`. Document the branch name in `index.html` and `validation.html`.
 
 ## Workflow
+
+Prefer **`productizer-begin-next-phase-planning`** when starting a **new** phase from the roadmap (or use command `/begin-next-phase-planning`).
 
 1. Read `specs/roadmap.html` for phase number, deliverable, and dependencies.
 2. Read `specs/tech-stack.html` and `specs/mission.html` for constraints.

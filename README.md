@@ -30,7 +30,9 @@ pnpm db:migrate
 pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) for the studio shell. DB health: [http://localhost:3000/api/health/db](http://localhost:3000/api/health/db).
+Open [http://localhost:3000](http://localhost:3000) for the studio shell. **Concept gallery:** [http://localhost:3000/concepts](http://localhost:3000/concepts). DB health: [http://localhost:3000/api/health/db](http://localhost:3000/api/health/db).
+
+REST API: `GET/POST /api/concepts`, `GET/PATCH/DELETE /api/concepts/:id` (DELETE archives).
 
 ### Scripts
 
@@ -41,16 +43,16 @@ Open [http://localhost:3000](http://localhost:3000) for the studio shell. DB hea
 | `pnpm start` | Run production server |
 | `pnpm lint` | ESLint |
 | `pnpm test` | Vitest unit tests |
-| `pnpm test:e2e` | Playwright smoke tests |
+| `pnpm test:e2e` | Playwright (studio smoke + concept CRUD) |
 | `pnpm db:generate` | Generate Drizzle migrations |
 | `pnpm db:migrate` | Apply migrations |
 
-### Validation (P0)
+### Validation (P1)
 
-On branch `phase/0-scaffold`:
+On branch `phase/1-concept-crud`:
 
 ```bash
-./scripts/validate-p0.sh
+./scripts/validate-p1.sh
 ```
 
-See [specs/20260519-phase0-scaffold/validation.html](specs/20260519-phase0-scaffold/validation.html).
+See [specs/20260519-phase1-concept-crud/validation.html](specs/20260519-phase1-concept-crud/validation.html).

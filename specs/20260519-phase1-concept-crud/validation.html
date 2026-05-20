@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Validation — P1 Concept CRUD</title>
+  <link rel="stylesheet" href="../shared.css" />
+  <style>
+    .checklist { list-style: none; margin-left: 0; padding: 0; }
+    .checklist li {
+      padding: 0.5rem 0.75rem;
+      margin-bottom: 0.35rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 0.9rem;
+    }
+    .checklist--agent li::before { content: "Auto · "; font-weight: 600; color: var(--accent); }
+    .checklist--manual li::before { content: "👤 "; color: var(--muted); }
+    .gate-ok {
+      border-left: 3px solid var(--idea);
+      background: rgba(61, 154, 106, 0.1);
+      padding: 1rem;
+      border-radius: 0 8px 8px 0;
+      margin: 1rem 0;
+    }
+  </style>
+</head>
+<body class="wide">
+  <nav class="breadcrumb">
+    <a href="../index.html">Constitution</a> /
+    <a href="index.html">P1 Concept CRUD</a> / Validation
+  </nav>
+  <article>
+    <h1>Validation — P1 Concept CRUD</h1>
+    <p class="lead">
+      <strong>Agents run automation first.</strong> Use <code>./scripts/validate-p1.sh</code>, <code>curl</code>, and Playwright CRUD specs. Manual user checks are minimal (merge approval, environment blockers only).
+    </p>
+
+    <div class="gate-ok">
+      <strong>PR-ready when:</strong> <code>./scripts/validate-p1.sh</code> exits 0, branch is <code>phase/1-concept-crud</code>, agent pasted validation summary in PR. Skills: <code>productizer-phase-validate</code>, <code>productizer-p1-concept-crud</code>.
+    </div>
+
+    <section>
+      <h2>1. Agent — run validation script</h2>
+      <pre><code>chmod +x scripts/validate-p1.sh scripts/validate-lib.sh
+
+# Spec + docs only (before implementation)
+./scripts/validate-p1.sh --tier docs
+
+# Full P1 (after implementation)
+./scripts/validate-p1.sh</code></pre>
+    </section>
+
+    <section>
+      <h2>2. Agent — what the script verifies</h2>
+      <table>
+        <thead><tr><th>Area</th><th>Automated how</th></tr></thead>
+        <tbody>
+          <tr><td>Git branch</td><td><code>phase/1-concept-crud</code></td></tr>
+          <tr><td>Secrets</td><td>Diff vs <code>master</code> — no <code>.env.local</code>, keys</td></tr>
+          <tr><td>Spec files</td><td><code>specs/20260519-phase1-concept-crud/</code> plan, requirements, validation, index</td></tr>
+          <tr><td>P0 regression</td><td>Postgres healthy; <code>/api/health/db</code> ok; home 200</td></tr>
+          <tr><td>Schema</td><td><code>design_concepts</code> in schema + migration file exists</td></tr>
+          <tr><td>API routes</td><td>Route files under <code>src/app/api/concepts/</code></td></tr>
+          <tr><td>UI routes</td><td><code>src/app/(studio)/concepts/page.tsx</code></td></tr>
+          <tr><td>Gate</td><td><code>pnpm db:migrate lint test build test:e2e</code></td></tr>
+          <tr><td>REST smoke</td><td><code>curl</code> POST concept → GET list contains name → DELETE archive</td></tr>
+          <tr><td>Gallery HTTP</td><td><code>curl /concepts</code> → 200, body contains gallery testid or Concepts heading</td></tr>
+          <tr><td>CRUD UX</td><td><strong>Playwright</strong> <code>e2e/concepts-crud.spec.ts</code></td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>3. Agent — curl reference (debug)</h2>
+      <pre><code># Create
+curl -s -X POST http://localhost:3000/api/concepts \
+  -H 'Content-Type: application/json' \
+  -d '{"name":"Validate Test Concept","campaignLabel":"test"}' | jq .
+
+# List
+curl -s http://localhost:3000/api/concepts | jq .
+
+# Archive (replace ID)
+curl -s -X DELETE http://localhost:3000/api/concepts/UUID | jq .
+
+# Gallery page
+curl -s -o /dev/null -w "HTTP %{http_code}\n" http://localhost:3000/concepts</code></pre>
+    </section>
+
+    <section>
+      <h2>4. Playwright — CRUD automation (required)</h2>
+      <p style="font-size:0.9rem;color:var(--muted)">File: <code>e2e/concepts-crud.spec.ts</code></p>
+      <ul class="checklist checklist--agent">
+        <li>Navigate to <code>/concepts</code> — gallery visible (<code>data-testid="concept-gallery"</code>)</li>
+        <li>Create concept via UI — unique name; success toast or redirect</li>
+        <li>Card/list shows new concept name</li>
+        <li>Open detail — edit name — save — updated name visible</li>
+        <li>Archive — confirm dialog — concept absent from default list (or archived badge)</li>
+        <li>Studio home links to concepts; phase badge P1</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>5. Recommended data-testid</h2>
+      <pre><code>concept-gallery
+concept-card
+concept-form
+concept-name-input
+concept-save
+concept-archive
+concept-empty-state</code></pre>
+    </section>
+
+    <section>
+      <h2>6. User — only when blocked</h2>
+      <ul class="checklist checklist--manual">
+        <li>Docker Desktop not running — start Docker, re-run script</li>
+        <li>Port 3000/5432 in use — free port or adjust compose</li>
+        <li>GitHub: approve and merge PR</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Requirements traceability</h2>
+      <table>
+        <thead><tr><th>Req</th><th>Verified by</th></tr></thead>
+        <tbody>
+          <tr><td>R1.1</td><td>script: schema + migration files</td></tr>
+          <tr><td>R1.2–R1.3</td><td>curl POST/GET/PATCH/DELETE in validate-p1.sh</td></tr>
+          <tr><td>R1.4–R1.8</td><td>Playwright CRUD + route file existence</td></tr>
+          <tr><td>R1.9</td><td>Playwright studio nav; curl home links</td></tr>
+          <tr><td>R1.10</td><td>pnpm test</td></tr>
+          <tr><td>R1.11</td><td>pnpm test:e2e</td></tr>
+          <tr><td>R1.12</td><td>validate-p1.sh exit 0</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>PR checklist (agent fills)</h2>
+      <pre><code>## Phase P1 — Concept CRUD
+
+**Branch:** `phase/1-concept-crud` → `master`
+
+### Validation
+```
+./scripts/validate-p1.sh
+# paste PASS/FAIL summary here
+```
+
+- [x] Agent ran validate-p1.sh (exit 0)
+- [x] Git: phase/1-concept-crud, no secrets in diff
+- [x] Automated: migrate, lint, test, build, test:e2e
+- [x] curl: REST create/list/archive smoke
+- [x] Playwright: concepts-crud.spec.ts green
+- [ ] User: merge PR on GitHub
+
+Spec: specs/20260519-phase1-concept-crud/</code></pre>
+    </section>
+
+    <section>
+      <h2>Out of scope</h2>
+      <ul>
+        <li>Asset upload, variations, AI, mocks, export</li>
+        <li>Auth and Etsy</li>
+      </ul>
+    </section>
+
+    <p style="margin-top:2rem;font-size:0.85rem">
+      <a href="plan.html" style="color:var(--link)">← Plan</a> ·
+      <a href="requirements.html" style="color:var(--link)">← Requirements</a>
+    </p>
+  </article>
+</body>
+</html>

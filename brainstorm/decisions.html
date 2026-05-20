@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Locked product and engineering decisions for Productizer (POD wave 1, digital wave 2, visual-first UX)." />
   <title>Decisions — Productizer Brainstorm</title>
   <link rel="stylesheet" href="shared.css" />
 </head>
@@ -10,71 +11,64 @@
   <nav class="breadcrumb"><a href="index.html">Brainstorm</a> / Decisions</nav>
   <article>
 
-    <div class="page-hero">
-      <div class="page-hero-visual">
-        <div class="mock-grid">
-          <div class="mini-mock mini-mock--tumbler" style="width:48px" aria-hidden="true"></div><div class="mini-mock mini-mock--shirt" style="width:48px" aria-hidden="true"></div><div class="mini-mock mini-mock--sign" style="width:48px" aria-hidden="true"></div><div class="mini-mock mini-mock--poster" style="width:48px" aria-hidden="true"></div><div class="mini-mock mini-mock--planner" style="width:48px" aria-hidden="true"></div>
-        </div>
-      </div>
-      <div class="page-hero-text">
-        <h1>Captured Decisions</h1>
-        <p class="lead">Locked-in choices for specs/constitution—with product visuals.</p>
-      </div>
+    <header class="page-intro">
+      <h1>Captured Decisions</h1>
+      <p class="lead">Choices locked during brainstorming. Implementation details live in <code>specs/roadmap.html</code> and phase specs.</p>
+    </header>
+
+    <div class="doc-context">
+      <dl>
+        <dt>Document purpose</dt>
+        <dd>Record what we agreed on so specs and code do not re-debate the same topics</dd>
+        <dt>Supersedes</dt>
+        <dd>Open questions on the same topics — see <a href="open-questions.html">open questions</a> for unresolved items</dd>
+      </dl>
     </div>
 
     <section>
       <h2>Product categories</h2>
       <div class="decided">
         <span class="label">Decided</span>
-        <strong>Wave 1 — POD</strong>
-        <div class="mock-grid">
-          <div class="mock-card"><div class="mini-mock mini-mock--tumbler" style="width:48px" aria-hidden="true"></div><span>Tumblers</span></div>
-          <div class="mock-card"><div class="mini-mock mini-mock--shirt" style="width:48px" aria-hidden="true"></div><span>T-shirts</span></div>
-          <div class="mock-card"><div class="mini-mock mini-mock--sign" style="width:48px" aria-hidden="true"></div><span>Signs</span></div>
-          <div class="mock-card"><div class="mini-mock mini-mock--poster" style="width:48px" aria-hidden="true"></div><span>Poster / art print</span></div>
-        </div>
+        <strong>Wave 1 — Print on demand (POD)</strong>
+        <ul class="chip-list" aria-label="Wave 1 product types">
+          <li><span class="chip">Tumblers</span></li>
+          <li><span class="chip">T-shirts</span></li>
+          <li><span class="chip">Signs</span></li>
+          <li><span class="chip">Poster / art print</span></li>
+        </ul>
       </div>
       <div class="decided">
         <span class="label">Decided</span>
         <strong>Wave 2 — Digital</strong>
-        <div class="mock-grid">
-          <div class="mock-card"><div class="mini-mock mini-mock--planner" style="width:48px" aria-hidden="true"></div><span>Planners &amp; printables</span></div>
-        </div>
-      </div>
-    </section>
-
-    <section>
-      <h2>UX</h2>
-      <div class="decided">
-        <span class="label">Decided</span>
-        <strong>Visual-first</strong> — brainstorm docs and Productizer UI use mini mockups, flow diagrams, and thumbs. <a href="visual-outputs.html">Style guide →</a>
-      </div>
-    </section>
-
-    <section>
-      <h2>Engineering order (Wave 1)</h2>
-      <div class="flow-pipeline">
-        <div class="flow-step"><div class="mini-mock mini-mock--poster" style="width:44px" aria-hidden="true"></div><span>Poster</span></div>
-        <span class="flow-arrow">→</span>
-        <div class="flow-step"><div class="mini-mock mini-mock--sign" style="width:44px" aria-hidden="true"></div><span>Sign</span></div>
-        <span class="flow-arrow">→</span>
-        <div class="flow-step"><div class="mini-mock mini-mock--tumbler" style="width:44px" aria-hidden="true"></div><span>Tumbler</span></div>
-        <span class="flow-arrow">→</span>
-        <div class="flow-step"><div class="mini-mock mini-mock--shirt" style="width:44px" aria-hidden="true"></div><span>Shirt</span></div>
-      </div>
-    </section>
-
-    <section>
-      <h2>Implications</h2>
-      <div class="row-with-mock">
-        <div class="mini-mock mini-mock--variations" style="width:56px" aria-hidden="true"></div>
-        <ul>
-          <li><strong>ProductType</strong> — distinct mock templates per POD type</li>
-          <li><strong>Etsy</strong> — physical vs digital flows (digital wave 2)</li>
-          <li><strong>Roadmap</strong> — one POD type per micro-phase</li>
-          <li><strong>MiniMock</strong> — thumb / card / full renditions</li>
+        <ul class="chip-list" aria-label="Wave 2 product types">
+          <li><span class="chip">Planners &amp; printables</span></li>
         </ul>
       </div>
+    </section>
+
+    <section>
+      <h2>UX &amp; documentation</h2>
+      <div class="decided">
+        <span class="label">Decided</span>
+        <strong>Clarity over decoration</strong> — Specs and UI prioritize readable structure (headings, tables, plain flows). Product mocks appear in the app when they carry meaning, not as abstract placeholders in docs.
+        See <a href="visual-outputs.html">documentation style</a>.
+      </div>
+    </section>
+
+    <section>
+      <h2>Engineering order (Wave 1 POD mocks)</h2>
+      <p>One product mock template per roadmap phase, in this order:</p>
+      <pre class="text-flow" aria-label="POD mock build order">Poster / art print  →  Signs  →  Tumbler  →  T-shirt</pre>
+    </section>
+
+    <section>
+      <h2>Implications for the codebase</h2>
+      <ul>
+        <li><strong>ProductType</strong> — distinct mock template per POD type</li>
+        <li><strong>Etsy</strong> — separate flows for physical vs digital listings (digital in wave 2)</li>
+        <li><strong>Roadmap</strong> — one POD type (or feature slice) per micro-phase</li>
+        <li><strong>Assets</strong> — thumb, card, and full renditions under <code>storage/</code></li>
+      </ul>
     </section>
 
   </article>

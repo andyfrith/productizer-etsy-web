@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Requirements — P1 Concept CRUD</title>
+  <link rel="stylesheet" href="../shared.css" />
+</head>
+<body class="wide">
+  <nav class="breadcrumb">
+    <a href="../index.html">Constitution</a> /
+    <a href="index.html">P1 Concept CRUD</a> / Requirements
+  </nav>
+  <article>
+    <h1>Requirements — P1 Concept CRUD</h1>
+    <p class="lead">Functional and technical requirements for design concept management. Satisfies roadmap phase 1 and unblocks P2 asset upload.</p>
+
+    <div class="decided">
+      <span class="label">Locked decisions</span>
+      <ul style="margin:0.5rem 0 0 1.25rem">
+        <li>Phase: <strong>P1</strong> — full roadmap Concept CRUD scope</li>
+        <li>API: <strong>REST</strong> route handlers under <code>/api/concepts</code></li>
+        <li>Runtime: <strong>pnpm</strong>, <strong>Node 22 LTS</strong></li>
+        <li>Validation bar: <strong>automated script + curl + Playwright CRUD E2E</strong></li>
+        <li>Spec folder: <code>specs/20260519-phase1-concept-crud/</code></li>
+        <li>Git branch: <code>phase/1-concept-crud</code> → merge via PR to <code>master</code></li>
+      </ul>
+    </div>
+
+    <section>
+      <h2>Goal</h2>
+      <p>
+        A user can create, view, edit, and archive design concepts from the studio UI. Data persists in Postgres via Drizzle. The concept list is the primary entry point for later variation and mock workflows.
+      </p>
+    </section>
+
+    <section>
+      <h2>Prerequisites (P0 merged)</h2>
+      <ul>
+        <li>Next.js App Router, shadcn/ui, TanStack Query, Drizzle, Docker Postgres</li>
+        <li><code>src/lib/schemas/concept.ts</code> — <code>conceptFormSchema</code> (extend if needed for status)</li>
+        <li>Studio shell at <code>src/app/(studio)/page.tsx</code></li>
+        <li>P0 validation: <code>./scripts/validate-p0.sh</code> passes on <code>master</code></li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Requirements (MUST)</h2>
+      <table>
+        <thead><tr><th>ID</th><th>Requirement</th><th>Acceptance</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><code>R1.1</code></td>
+            <td><code>design_concepts</code> table</td>
+            <td>Drizzle schema + migration: <code>id</code> (uuid), <code>name</code>, <code>description</code>, <code>campaign_label</code>, <code>style_notes</code>, <code>status</code> (<code>draft</code> | <code>active</code> | <code>archived</code>), <code>created_at</code>, <code>updated_at</code>; aligns with <a href="../tech-stack.html" style="color:var(--link)">tech-stack</a> excerpt</td>
+          </tr>
+          <tr>
+            <td><code>R1.2</code></td>
+            <td>REST list &amp; create</td>
+            <td><code>GET /api/concepts</code> returns JSON array (exclude archived by default; <code>?includeArchived=true</code> optional); <code>POST /api/concepts</code> validates body with Zod, returns 201 + concept</td>
+          </tr>
+          <tr>
+            <td><code>R1.3</code></td>
+            <td>REST read, update, archive</td>
+            <td><code>GET /api/concepts/[id]</code>; <code>PATCH /api/concepts/[id]</code> for editable fields; <code>DELETE /api/concepts/[id]</code> sets <code>status=archived</code> (soft delete, not hard delete)</td>
+          </tr>
+          <tr>
+            <td><code>R1.4</code></td>
+            <td>Concept form</td>
+            <td><code>ConceptForm</code> with React Hook Form + <code>zodResolver(conceptFormSchema)</code>; shadcn Input, Textarea, Label, Button; inline field errors</td>
+          </tr>
+          <tr>
+            <td><code>R1.5</code></td>
+            <td>TanStack Query hooks</td>
+            <td><code>useConcepts</code>, <code>useConcept(id)</code>, mutations for create/update/archive; cache invalidation on success; Sonner toast on success/error</td>
+          </tr>
+          <tr>
+            <td><code>R1.6</code></td>
+            <td>Concept gallery page</td>
+            <td><code>/concepts</code> — grid of shadcn Cards: name, campaign label, status badge, created date; Skeleton while loading; empty state CTA</td>
+          </tr>
+          <tr>
+            <td><code>R1.7</code></td>
+            <td>Concept detail / edit</td>
+            <td><code>/concepts/[id]</code> — view + edit form; archive action with confirm dialog (shadcn AlertDialog); navigate back to gallery</td>
+          </tr>
+          <tr>
+            <td><code>R1.8</code></td>
+            <td>Create flow</td>
+            <td><code>/concepts/new</code> or modal from gallery — submit creates concept and redirects to detail or gallery</td>
+          </tr>
+          <tr>
+            <td><code>R1.9</code></td>
+            <td>Studio navigation</td>
+            <td>Studio home links to <code>/concepts</code>; phase badge shows P1; remove disabled “coming in P1” placeholder</td>
+          </tr>
+          <tr>
+            <td><code>R1.10</code></td>
+            <td>Unit tests</td>
+            <td>Vitest: schema validation; API handler or service tests for create + archive (mock DB or test DB)</td>
+          </tr>
+          <tr>
+            <td><code>R1.11</code></td>
+            <td>E2E CRUD smoke</td>
+            <td>Playwright: create concept → appears in list → edit name → archive → hidden from default list</td>
+          </tr>
+          <tr>
+            <td><code>R1.12</code></td>
+            <td>Validation script</td>
+            <td><code>./scripts/validate-p1.sh</code> — branch, spec files, P0 regression subset, curl API, <code>pnpm lint test build test:e2e</code></td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>Requirements (SHOULD)</h2>
+      <ul>
+        <li>Framer Motion stagger on concept card grid (reuse P0 pattern)</li>
+        <li><code>data-testid</code> on gallery, form, and archive confirm for E2E stability</li>
+        <li>Filter tabs: All / Active / Draft / Archived on gallery</li>
+        <li>Search by name (client-side filter acceptable for P1)</li>
+        <li>shadcn components: <code>dialog</code>, <code>alert-dialog</code>, <code>badge</code>, <code>input</code>, <code>textarea</code>, <code>label</code> as needed</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Out of scope (P1)</h2>
+      <ul>
+        <li>Asset upload and <code>concept_variations</code> table (P2–P3)</li>
+        <li>Variation gallery, approve/reject, AI generation (P3–P4)</li>
+        <li>Poster mock, product types, export (P5–P8)</li>
+        <li>Concept dashboard hero thumb from assets (P6 — needs uploads)</li>
+        <li>Auth, multi-user, Etsy (P11+)</li>
+        <li>Hard delete of concepts from database</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Non-functional</h2>
+      <ul>
+        <li><strong>UX polish:</strong> Card layout consistent with studio shell; loading/error/empty states on all concept views</li>
+        <li><strong>Security:</strong> No secrets in API responses; validate all inputs server-side with Zod</li>
+        <li><strong>API errors:</strong> 400 validation, 404 not found, 500 with safe message (no stack in JSON)</li>
+        <li><strong>Accessibility:</strong> Form labels, focus management in dialogs, keyboard-operable archive confirm</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Dependencies</h2>
+      <ul>
+        <li>P0 merged to <code>master</code></li>
+        <li>Docker Postgres running; <code>pnpm db:migrate</code></li>
+        <li>Existing packages: zod, react-hook-form, @hookform/resolvers, @tanstack/react-query</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Proposed repo layout (post-P1)</h2>
+      <pre><code>src/
+├── app/
+│   ├── (studio)/
+│   │   ├── page.tsx                 # links to /concepts
+│   │   └── concepts/
+│   │       ├── page.tsx             # gallery
+│   │       ├── new/page.tsx
+│   │       └── [id]/page.tsx
+│   └── api/concepts/
+│       ├── route.ts                 # GET, POST
+│       └── [id]/route.ts            # GET, PATCH, DELETE
+├── components/concepts/
+│   ├── concept-form.tsx
+│   ├── concept-card.tsx
+│   └── concept-gallery.tsx
+├── hooks/
+│   └── use-concepts.ts
+├── lib/
+│   ├── db/schema.ts                 # designConcepts table
+│   ├── schemas/concept.ts
+│   └── concepts/                    # optional: service layer
+│       └── repository.ts
+drizzle/
+└── migrations/                      # design_concepts
+e2e/
+└── concepts-crud.spec.ts
+tests/
+└── concept-schema.test.ts</code></pre>
+    </section>
+
+    <p style="margin-top:2rem;font-size:0.85rem">
+      <a href="plan.html" style="color:var(--link)">→ Implementation plan</a> ·
+      <a href="validation.html" style="color:var(--link)">→ Validation checklist</a>
+    </p>
+  </article>
+</body>
+</html>
