@@ -3,73 +3,85 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Productizer constitution: mission, tech stack, phased roadmap, git workflow, and phase specs." />
   <title>Productizer — Constitution</title>
   <link rel="stylesheet" href="shared.css" />
-  <style>
-    body { max-width: 960px; padding-top: 0; }
-    .site-header {
-      padding: 2rem 2rem 1.25rem;
-      margin: 0 -2rem 1.5rem;
-      border-bottom: 1px solid var(--border);
-      background: linear-gradient(180deg, var(--surface) 0%, var(--bg) 100%);
-    }
-  </style>
 </head>
-<body>
+<body class="wide">
   <header class="site-header">
     <h1>Productizer Constitution</h1>
-    <p class="lead" style="margin-bottom:0.75rem">
-      Mission, tech stack, and phased roadmap. Initial phases center on <strong style="color:var(--accent)">design concept creation &amp; management</strong>.
+    <p class="lead">
+      Source of truth for what we are building, how we build it, and how each phase is validated.
+      Initial work focuses on <strong>design concept creation and management</strong>; Etsy and niche research come later.
     </p>
-    <div class="mock-grid" style="justify-content:flex-start">
-      <div class="mini-mock mini-mock--concept" style="width:56px" aria-hidden="true"></div><div class="mini-mock mini-mock--variations" style="width:56px" aria-hidden="true"></div><div class="mini-mock mini-mock--poster" style="width:56px" aria-hidden="true"></div>
-      <span style="align-self:center;color:var(--muted);font-size:0.85rem">→ Etsy &amp; niche research later</span>
-    </div>
   </header>
+
   <main>
+    <div class="doc-context">
+      <dl>
+        <dt>Audience</dt>
+        <dd>Contributors and LLM agents implementing roadmap phases</dd>
+        <dt>Start here</dt>
+        <dd><a href="mission.html">Mission</a> → <a href="roadmap.html">Roadmap</a> → active phase spec folder</dd>
+        <dt>Validation</dt>
+        <dd>Each phase has <code>validation.html</code> and <code>scripts/validate-pN.sh</code></dd>
+      </dl>
+    </div>
+
+    <h2>Core documents</h2>
     <nav class="hub-grid">
       <a class="hub-card" href="mission.html">
-        <div class="hub-card-thumb"><div class="mini-mock mini-mock--concept" style="width:64px" aria-hidden="true"></div></div>
-        <div class="hub-card-body"><h3>Mission</h3><p>Why we exist, scope now vs later.</p></div>
+        <div class="hub-card-body">
+          <h3>Mission</h3>
+          <p>Why we exist; scope now vs deferred modules.</p>
+        </div>
       </a>
       <a class="hub-card" href="tech-stack.html">
-        <div class="hub-card-thumb" style="font-family:monospace;font-size:0.75rem;color:var(--accent)">Docker · shadcn · TanStack</div>
-        <div class="hub-card-body"><h3>Tech Stack</h3><p>UI, data, AI, testing, UX polish.</p></div>
+        <div class="hub-card-body">
+          <h3>Tech Stack</h3>
+          <p>Next.js, Drizzle, Docker Postgres, testing, UI conventions.</p>
+        </div>
       </a>
       <a class="hub-card" href="roadmap.html">
-        <div class="hub-card-thumb" style="font-size:1.25rem;font-weight:700;color:var(--accent)">P0–P18</div>
-        <div class="hub-card-body"><h3>Roadmap</h3><p>Micro-phases with visuals &amp; code touchpoints.</p></div>
+        <div class="hub-card-body">
+          <h3>Roadmap</h3>
+          <p>Phases P0–P16 with deliverables and dependencies.</p>
+        </div>
       </a>
       <a class="hub-card" href="git-workflow.html">
-        <div class="hub-card-thumb" style="font-family:monospace;font-size:0.7rem;color:var(--accent)">phase/N</div>
-        <div class="hub-card-body"><h3>Git Workflow</h3><p>Branch per phase; merge via pull request.</p></div>
+        <div class="hub-card-body">
+          <h3>Git Workflow</h3>
+          <p>Branch <code>phase/N-slug</code>; merge via pull request only.</p>
+        </div>
       </a>
       <a class="hub-card" href="validation-policy.html">
-        <div class="hub-card-thumb" style="font-size:1.1rem">🤖</div>
-        <div class="hub-card-body"><h3>Validation Policy</h3><p>Agent-run scripts, curl, Playwright; minimal manual.</p></div>
+        <div class="hub-card-body">
+          <h3>Validation Policy</h3>
+          <p>Agent-run scripts and Playwright; minimal manual checks.</p>
+        </div>
       </a>
     </nav>
 
-    <h2 style="font-size:1.1rem;margin:2rem 0 0.75rem;padding-bottom:0.35rem;border-bottom:1px solid var(--border);color:var(--accent)">Phase specs (active)</h2>
+    <h2>Phase specs (active)</h2>
     <nav class="hub-grid">
       <a class="hub-card" href="20260519-phase0-scaffold/index.html">
-        <div class="hub-card-thumb" style="font-size:0.75rem;font-weight:700;color:var(--accent)">P0 · done</div>
+        <div class="hub-card-meta"><span class="chip">P0 · done</span></div>
         <div class="hub-card-body">
           <h3>Phase 0 — Scaffold</h3>
-          <p>Plan, requirements, validation for app bootstrap.</p>
+          <p>App bootstrap, Docker Postgres, test harness.</p>
         </div>
       </a>
       <a class="hub-card" href="20260519-phase1-concept-crud/index.html">
-        <div class="hub-card-thumb" style="font-size:0.75rem;font-weight:700;color:var(--accent)">P1 · now</div>
+        <div class="hub-card-meta"><span class="chip">P1 · now</span></div>
         <div class="hub-card-body">
           <h3>Phase 1 — Concept CRUD</h3>
-          <p>Create, edit, archive design concepts; REST API and gallery UI.</p>
+          <p>REST API and studio UI for design concepts.</p>
         </div>
       </a>
     </nav>
 
     <p style="margin-top:2rem;font-size:0.85rem;color:var(--muted)">
-      Brainstorm background: <a href="../brainstorm/index.html" style="color:var(--accent)">../brainstorm/</a>
+      Background brainstorm: <a href="../brainstorm/index.html">../brainstorm/</a>
     </p>
   </main>
 </body>

@@ -3,62 +3,92 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Visual Outputs — Productizer Brainstorm</title>
+  <meta name="description" content="How Productizer documentation is structured for human and LLM readers: text-first, light layout, clear context blocks." />
+  <title>Documentation Style — Productizer</title>
   <link rel="stylesheet" href="shared.css" />
 </head>
 <body class="wide">
-  <nav class="breadcrumb"><a href="index.html">Brainstorm</a> / Visual Docs Style</nav>
+  <nav class="breadcrumb"><a href="index.html">Brainstorm</a> / Documentation style</nav>
   <article>
 
-    <div class="page-hero">
-      <div class="page-hero-visual">
-        <div class="mock-grid">
-          <div class="mini-mock mini-mock--listing" style="width:64px" aria-hidden="true"></div><div class="mini-mock mini-mock--poster" style="width:64px" aria-hidden="true"></div><div class="mini-mock mini-mock--export" style="width:64px" aria-hidden="true"></div>
-        </div>
-      </div>
-      <div class="page-hero-text">
-        <h1>Visual Brainstorm Docs</h1>
-        <p class="lead">These HTML pages use mini mockups, flow diagrams, and cards—not text-only walls. The Productizer app should follow the same principle.</p>
-      </div>
-    </div>
+    <header class="page-intro">
+      <h1>Documentation style</h1>
+      <p class="lead">How we write constitution and brainstorm pages so both people and agents can parse intent quickly—without decorative icons or ambiguous graphics.</p>
+    </header>
 
-    <div class="decided">
-      <span class="label">Style guide</span>
-      Every brainstorm page: page hero + diagrams where helpful. Tables include a visual column when possible.
+    <div class="doc-context">
+      <dl>
+        <dt>Principle</dt>
+        <dd>Content first: titles, lead paragraphs, tables, and lists carry meaning</dd>
+        <dt>For LLM agents</dt>
+        <dd>Each article starts with a <code>doc-context</code> block (purpose, audience, status)</dd>
+        <dt>For humans</dt>
+        <dd>Light background, comfortable line length, semantic callouts (decided / deferred / focus)</dd>
+      </dl>
     </div>
 
     <section>
-      <h2>Doc components (shared.css)</h2>
-      <div class="module-grid">
-        <div class="module-tile"><span style="font-size:1.5rem">▦</span><strong>mock-grid</strong></div>
-        <div class="module-tile"><span style="font-size:1.5rem">→</span><strong>flow-pipeline</strong></div>
-        <div class="module-tile"><span style="font-size:1.5rem">👤</span><strong>persona-card</strong></div>
-        <div class="module-tile"><span style="font-size:1.5rem">📋</span><strong>phase-timeline</strong></div>
-      </div>
+      <h2>What we avoid in docs</h2>
+      <ul>
+        <li>Abstract “mini mock” shapes that do not map to a specific UI screenshot</li>
+        <li>Emoji or icon grids that restate what the heading already says</li>
+        <li>Dark themes with high-contrast accent colors that distract from reading</li>
+        <li>Flows drawn only as nameless boxes without labels</li>
+      </ul>
     </section>
 
     <section>
-      <h2>Product type mini mocks</h2>
-      <div class="mock-grid">
-        <div class="mock-card"><div class="mini-mock mini-mock--poster" aria-hidden="true"></div><span>Poster</span></div>
-        <div class="mock-card"><div class="mini-mock mini-mock--sign" aria-hidden="true"></div><span>Sign</span></div>
-        <div class="mock-card"><div class="mini-mock mini-mock--tumbler" aria-hidden="true"></div><span>Tumbler</span></div>
-        <div class="mock-card"><div class="mini-mock mini-mock--shirt" aria-hidden="true"></div><span>T-shirt</span></div>
-        <div class="mock-card"><div class="mini-mock mini-mock--planner" aria-hidden="true"></div><span>Planner</span></div>
-        <div class="mock-card"><div class="mini-mock mini-mock--listing" aria-hidden="true"></div><span>Listing</span></div>
-      </div>
-    </section>
-
-    <section>
-      <h2>App surfaces (same visual language)</h2>
+      <h2>What we use instead</h2>
       <table>
-        <thead><tr><th></th><th>Surface</th><th>Mini mock</th></tr></thead>
+        <thead>
+          <tr><th>Need</th><th>Pattern</th><th>Example</th></tr>
+        </thead>
         <tbody>
-          <tr><td class="visual-cell"><div class="mini-mock mini-mock--niche" style="width:40px" aria-hidden="true"></div></td><td>Niche picker</td><td>Mood / example strip</td></tr>
-          <tr><td class="visual-cell"><div class="mini-mock mini-mock--variations" style="width:40px" aria-hidden="true"></div></td><td>Variation gallery</td><td>Thumb grid</td></tr>
-          <tr><td class="visual-cell"><div class="mini-mock mini-mock--export" style="width:40px" aria-hidden="true"></div></td><td>Export pack</td><td>Folder preview</td></tr>
+          <tr>
+            <td>Product types</td>
+            <td><code>.chip</code> / <code>.chip-list</code></td>
+            <td>Poster, Sign, Tumbler</td>
+          </tr>
+          <tr>
+            <td>Phase or lane</td>
+            <td><code>.lane-tag</code>, <code>.phase-tag</code></td>
+            <td>now, next, later</td>
+          </tr>
+          <tr>
+            <td>Sequence</td>
+            <td><code>pre.text-flow</code> or roadmap table</td>
+            <td>Concept → Variations → Mock</td>
+          </tr>
+          <tr>
+            <td>Locked choice</td>
+            <td><code>.decided</code></td>
+            <td>Wave 1 POD scope</td>
+          </tr>
+          <tr>
+            <td>Out of scope</td>
+            <td><code>.deferred</code></td>
+            <td>Niche research module</td>
+          </tr>
+          <tr>
+            <td>Current priority</td>
+            <td><code>.focus-now</code></td>
+            <td>P0–P6 concept studio</td>
+          </tr>
         </tbody>
       </table>
+    </section>
+
+    <section>
+      <h2>App UI vs documentation</h2>
+      <p>
+        The running Productizer app uses real thumbnails, mock composites, and galleries where visuals help sellers decide.
+        Specification HTML stays textual so agents can grep paths, phase IDs, and acceptance criteria without interpreting decorative CSS art.
+      </p>
+    </section>
+
+    <section>
+      <h2>Stylesheet</h2>
+      <p>Shared styles: <code>specs/shared.css</code> (imported by <code>brainstorm/shared.css</code>). Palette: warm off-white background, forest-green links, slate body text.</p>
     </section>
 
   </article>

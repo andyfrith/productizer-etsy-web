@@ -10,9 +10,12 @@
   <nav class="breadcrumb"><a href="index.html">Constitution</a> / Tech Stack</nav>
   <article>
 
-    <div class="page-hero">
-      <div class="page-hero-visual">
-        <pre class="arch-diagram">┌──────────────────────────────────────────────┐
+    <header class="page-intro">
+      <h1>Tech Stack</h1>
+      <p class="lead">Local operation via <strong>Docker Compose</strong> + <code>pnpm dev</code>. Cloud hosting remains TBD.</p>
+    </header>
+
+    <pre class="arch-diagram" aria-label="Architecture overview">┌──────────────────────────────────────────────┐
 │  Next.js · React · TypeScript                │
 │  shadcn/ui · Tailwind · Framer Motion        │
 │  TanStack Query · RHF · Zod                  │
@@ -29,12 +32,6 @@
  Vitest (unit) · Playwright (E2E)
 
  Docker Compose — Postgres (+ optional services)</pre>
-      </div>
-      <div class="page-hero-text">
-        <h1>Tech Stack</h1>
-        <p class="lead">Local operation via <strong>Docker Compose</strong> + <code>pnpm dev</code>. Cloud hosting remains TBD.</p>
-      </div>
-    </div>
 
     <div class="decided">
       <span class="label">Decided</span>
@@ -99,11 +96,9 @@
       <p>Backing services run in Docker; the Next.js app runs on the host for fast HMR. Same setup for every developer.</p>
       <div class="flow-pipeline">
         <div class="flow-step"><span style="font-size:1.25rem">🐳</span><span>docker compose up -d</span></div>
-        <span class="flow-arrow">+</span>
         <div class="flow-step"><span style="font-size:1.25rem">▶</span><span>pnpm dev</span></div>
       </div>
       <div class="row-with-mock">
-        <div class="mini-mock mini-mock--export" style="width:56px" aria-hidden="true"></div>
         <ul>
           <li><code>docker compose up -d</code> — Postgres (future: Redis, etc.)</li>
           <li><code>pnpm dev</code> — Next.js at <code>localhost:3000</code></li>
@@ -215,7 +210,6 @@ export interface ImageGenerationProvider {
 // lib/ai/providers/nanobanana.ts
 // lib/ai/registry.ts — standard vs pro tier</code></pre>
       <div class="visual-idea">
-        <div class="mini-mock mini-mock--ai" style="width:56px" aria-hidden="true"></div>
         <div class="visual-idea-body">
           <strong>Job queue (phase 6+):</strong> In-process or <code>bullmq</code> + Redis when async generation volume warrants it.
           For local dev, synchronous generation with loading UI is acceptable initially.
