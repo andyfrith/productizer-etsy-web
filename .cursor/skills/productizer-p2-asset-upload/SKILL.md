@@ -2,9 +2,9 @@
 name: productizer-p2-asset-upload
 description: >-
   Implement Productizer roadmap P2 Asset Upload: design_assets table,
-  reference_asset_id on concepts, POST /api/assets multipart, sharp thumb/card/full,
-  file serving route, AssetUpload UI on concept detail. Use when implementing
-  phase 2 or specs/20260520-phase2-asset-upload.
+  preview_asset_id on concepts, multiple references per concept, POST /api/assets
+  multipart, sharp thumb/card/full, file serving route, reference gallery UI.
+  Use when implementing phase 2 or specs/20260520-phase2-asset-upload.
 ---
 
 # Productizer P2 — Asset Upload
@@ -12,15 +12,20 @@ description: >-
 ## Before coding
 
 1. Branch: `phase/2-asset-upload` off latest `master` (`productizer-git-workflow`)
-2. Read `specs/20260520-phase2-asset-upload/requirements.html`
+2. Read `specs/20260520-phase2-asset-upload/requirements.html` (including **Phase amendments**)
 3. Follow `plan.html` step order
 4. Run `./scripts/validate-p2.sh --tier docs` after spec-only commits; full script before PR
+
+## In-phase drop-in requests
+
+On UX or behavior changes during P2, update `specs/20260520-phase2-asset-upload/` in the same session as code—see `specs/validation-policy.html#in-phase-amendments`.
 
 ## Implementation checklist
 
 ### Database (R2.1–R2.2)
 
-- Add `designAssets` table; `referenceAssetId` on `designConcepts`
+- Add `designAssets` table; `previewAssetId` on `designConcepts` (renamed from `reference_asset_id`)
+- Multiple assets per concept via `design_assets.concept_id`
 - `pnpm db:generate && pnpm db:migrate`
 
 ### Dependencies (R2.4)
@@ -37,19 +42,22 @@ description: >-
 
 - `POST` `src/app/api/assets/route.ts` — `formData()`, file + optional `conceptId`
 - `GET` `src/app/api/assets/[id]/route.ts` — metadata
+- `DELETE` `src/app/api/assets/[id]/route.ts` — `?conceptId=` remove one reference
+- `GET` `src/app/api/concepts/[id]/references/route.ts` — list references
+- `PUT` `src/app/api/concepts/[id]/preview/route.ts` — `{ assetId }` set preview
 - `GET` `src/app/api/assets/[id]/file/route.ts` — `?variant=thumb|card|full`
 - MIME allowlist: png, jpeg, webp; max size ~10MB
 - JSON errors: `{ error: string }`
 
 ### Data layer
 
-- `src/lib/assets/repository.ts` — create asset, write files, link concept
+- `src/lib/assets/repository.ts` — create, list, delete; set preview only when concept has none
 - `src/lib/schemas/asset.ts` — validation constants
 
 ### Client (R2.7–R2.8)
 
-- `src/hooks/use-upload-asset.ts`
-- `src/components/assets/asset-upload.tsx` with `data-testid="asset-upload"` and `data-testid="asset-preview"`
+- `src/hooks/use-reference-assets.ts` — upload, list, set preview, delete
+- `src/components/assets/asset-upload.tsx` — gallery, preview badge, set preview, undo remove
 - Wire into `src/app/(studio)/concepts/[id]/page.tsx`
 
 ### Tests (R2.10–R2.11)

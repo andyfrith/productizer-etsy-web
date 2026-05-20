@@ -64,9 +64,20 @@ Follow `specs/validation-policy.html`. **Agent-first, minimal manual.**
 - **PR checklist:** agent pastes script PASS/FAIL summary.
 - Add `scripts/validate-pN.sh` using `scripts/validate-lib.sh` helpers.
 
+## In-phase drop-in requests
+
+When the user adds requirements during an active phase (same `phase/{N}-{slug}` branch):
+
+1. Update **current** phase folder only—not the next phase’s spec.
+2. `requirements.html`: change acceptance text; add **Phase amendments** section/table if missing (see P2 example).
+3. `validation.html`: Playwright/curl/script checks for new behavior.
+4. `plan.html` / `index.html`: brief note under in-phase sections.
+5. Policy: `specs/validation-policy.html#in-phase-amendments`.
+
 ## Do not
 
 - Create or edit phase specs on `master` — use `phase/{N}-{slug}`.
+- Ship drop-in code without updating the active phase spec docs.
 - Commit `.env.local` or API keys.
 - Expand scope into the next roadmap phase without user approval.
 - Skip validation.html — every phase needs a PR-ready definition of done.

@@ -48,6 +48,16 @@ export function ConceptCard({ concept, index = 0 }: ConceptCardProps) {
           className="h-full transition-colors hover:border-primary/40"
         >
           <CardHeader>
+            {concept.previewAssetId ? (
+              <div className="mb-3 overflow-hidden rounded-md border border-border bg-muted/30">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={`/api/assets/${concept.previewAssetId}/file?variant=thumb`}
+                  alt=""
+                  className="h-20 w-full object-cover"
+                />
+              </div>
+            ) : null}
             <div className="flex items-start justify-between gap-2">
               <CardTitle className="line-clamp-2 text-base">
                 {concept.name}

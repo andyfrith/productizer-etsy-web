@@ -74,7 +74,7 @@ git branch --show-current   # must print: phase/2-asset-upload</code></pre>
       <h2>Step 5 — Client hook &amp; component</h2>
       <ol>
         <li><code>src/hooks/use-upload-asset.ts</code> — FormData mutation + cache invalidation</li>
-        <li><code>src/components/assets/asset-upload.tsx</code> — file input, preview <code>&lt;img src=.../file?variant=card&gt;</code></li>
+        <li><code>src/components/assets/asset-upload.tsx</code> — file input; server card preview (<code>asset-preview</code>) + local object-URL preview (<code>asset-preview-local</code>) before upload</li>
         <li>Wire into <code>src/app/(studio)/concepts/[id]/page.tsx</code></li>
       </ol>
     </section>
@@ -107,6 +107,18 @@ git branch --show-current   # must print: phase/2-asset-upload</code></pre>
     "db:studio": "drizzle-kit studio"
   }
 }</code></pre>
+    </section>
+
+    <section>
+      <h2>In-phase drop-in requests</h2>
+      <p style="font-size:0.9rem;color:var(--muted)">
+        When the user adds UX or behavior during P2 implementation (not a new roadmap phase), update <code>requirements.html</code> (acceptance + amendments table), <code>validation.html</code>, and this plan in the same work session—before or with the code PR. Do not leave specs stale.
+      </p>
+      <ul>
+        <li>2026-05-20 — Pre-upload local preview documented under <a href="requirements.html#phase-amendments" style="color:var(--link)">requirements → Phase amendments</a></li>
+        <li>2026-05-20 — Pending/saved visual distinction + remove (local + <code>DELETE …/reference</code>)</li>
+        <li>2026-05-20 — Undo toast on remove (<code>PUT …/reference</code> restore for saved)</li>
+      </ul>
     </section>
 
     <section>

@@ -47,6 +47,17 @@ git checkout phase/N-slug      # existing
 - User must request commits explicitly (project rule).
 - Suggested message prefix: `phase(N): …`
 
+## In-phase drop-in requests
+
+While the user is still on the active phase branch, small scope additions (UX, behavior, tests) require **spec + code** updates together:
+
+1. Edit `specs/{folder}/requirements.html` (acceptance + **Phase amendments** table).
+2. Edit `validation.html` / E2E when checks change.
+3. Update the phase implementation skill if needed.
+4. See `specs/validation-policy.html#in-phase-amendments` and `productizer-phase-spec`.
+
+Do not implement drop-ins without updating the current phase spec.
+
 ## Pull requests
 
 1. Agent runs `./scripts/validate-pN.sh` (exit 0) — see `productizer-phase-validate`

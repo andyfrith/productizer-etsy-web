@@ -34,7 +34,9 @@ Open [http://localhost:3000](http://localhost:3000) for the studio shell. **Conc
 
 REST API: `GET/POST /api/concepts`, `GET/PATCH/DELETE /api/concepts/:id` (DELETE archives).
 
-**Database UI:** With Postgres running, `pnpm db:studio` opens Drizzle Kit Studio for inspecting and editing tables (e.g. `design_concepts`).
+**Asset upload (P2):** Add multiple reference images and choose a **preview** for the gallery. **Archive** hides images from Active (undo via toast); open **Archived** to permanently delete with confirmation. API: `GET /api/concepts/:id/references?archived=true|false`, `PUT …/preview`, `DELETE /api/assets/:id?conceptId=` (archive), `POST /api/assets/:id?conceptId=` (restore), `DELETE …&permanent=true` (archived only).
+
+**Database UI:** With Postgres running, `pnpm db:studio` opens Drizzle Kit Studio for inspecting and editing tables (e.g. `design_concepts`, `design_assets`).
 
 ### Scripts
 
@@ -45,17 +47,17 @@ REST API: `GET/POST /api/concepts`, `GET/PATCH/DELETE /api/concepts/:id` (DELETE
 | `pnpm start` | Run production server |
 | `pnpm lint` | ESLint |
 | `pnpm test` | Vitest unit tests |
-| `pnpm test:e2e` | Playwright (studio smoke + concept CRUD) |
+| `pnpm test:e2e` | Playwright (studio smoke, concept CRUD, asset upload) |
 | `pnpm db:generate` | Generate Drizzle migrations |
 | `pnpm db:migrate` | Apply migrations |
 | `pnpm db:studio` | Drizzle Kit Studio (browse/edit DB at [https://local.drizzle.studio](https://local.drizzle.studio); requires Postgres + `.env.local`) |
 
-### Validation (P1)
+### Validation (P2)
 
-On branch `phase/1-concept-crud`:
+On branch `phase/2-asset-upload`:
 
 ```bash
-./scripts/validate-p1.sh
+./scripts/validate-p2.sh
 ```
 
-See [specs/20260519-phase1-concept-crud/validation.html](specs/20260519-phase1-concept-crud/validation.html).
+See [specs/20260520-phase2-asset-upload/validation.html](specs/20260520-phase2-asset-upload/validation.html).

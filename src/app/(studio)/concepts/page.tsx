@@ -15,7 +15,7 @@ export default function ConceptsPage() {
 
   return (
     <div className="flex flex-1 flex-col">
-      <StudioHeader phaseLabel="Phase P1" subtitle="Design concepts" />
+      <StudioHeader phaseLabel="Phase P2" subtitle="Design concepts" />
 
       <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-6 px-6 py-10">
         <div className="flex flex-wrap items-center justify-between gap-4">

@@ -32,6 +32,30 @@
       </ul>
     </section>
 
+    <section id="in-phase-amendments">
+      <h2>In-phase amendments (drop-in requests)</h2>
+      <p style="font-size:0.9rem;color:var(--muted)">
+        While a roadmap phase is active on <code>phase/{N}-{slug}</code>, the user may request small additions or UX fixes that stay within that phase’s scope. Treat these as <strong>spec + code</strong> work—not silent code-only changes.
+      </p>
+      <ol>
+        <li>Confirm the request fits the <strong>current</strong> phase (not the next roadmap row). If it belongs to a later phase, say so and defer.</li>
+        <li>Update the active phase folder <code>specs/{YYYYMMDD}-phase{N}-{slug}/</code>:
+          <ul>
+            <li><code>requirements.html</code> — adjust acceptance criteria; add a row to <strong>Phase amendments</strong></li>
+            <li><code>validation.html</code> — new or changed automated checks (Playwright <code>data-testid</code>, curl, script)</li>
+            <li><code>plan.html</code> — note under <strong>In-phase drop-in requests</strong> when helpful</li>
+            <li><code>index.html</code> — one-line summary under <strong>In-phase updates</strong> when user-facing</li>
+          </ul>
+        </li>
+        <li>Update the phase implementation skill (e.g. <code>productizer-p2-asset-upload</code>) if behavior is non-obvious for future agents.</li>
+        <li>Implement on the same phase branch; run <code>./scripts/validate-pN.sh</code> before PR.</li>
+        <li>README: only if the drop-in changes developer or user-facing workflows.</li>
+      </ol>
+      <p style="font-size:0.85rem;color:var(--muted)">
+        Enforced by <code>productizer-git-workflow</code>, <code>productizer-phase-spec</code>, and <code>.cursor/rules/git-workflow.mdc</code>.
+      </p>
+    </section>
+
     <section>
       <h2>Skills</h2>
       <ul>

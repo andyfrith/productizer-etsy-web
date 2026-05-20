@@ -15,6 +15,27 @@
       "when": 1779240653287,
       "tag": "0001_third_leper_queen",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1779290714531,
+      "tag": "0002_yummy_fabian_cortez",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1779291200000,
+      "tag": "0003_preview_asset_rename",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1779292000000,
+      "tag": "0004_asset_archived_at",
+      "breakpoints": true
     }
   ]
 }
