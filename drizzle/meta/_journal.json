@@ -8,6 +8,13 @@
       "when": 1779238393812,
       "tag": "0000_burly_proemial_gods",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1779240653287,
+      "tag": "0001_third_leper_queen",
+      "breakpoints": true
     }
   ]
 }
