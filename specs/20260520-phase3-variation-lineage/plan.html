@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Plan — P3 Variation Lineage</title>
+  <link rel="stylesheet" href="../shared.css" />
+</head>
+<body class="wide">
+  <nav class="breadcrumb">
+    <a href="../index.html">Constitution</a> /
+    <a href="index.html">P3 Variation Lineage</a> / Plan
+  </nav>
+  <article>
+    <h1>Implementation Plan — P3 Variation Lineage</h1>
+    <p class="lead">Ordered steps to implement requirements R3.1–R3.16. Each step should leave the repo in a runnable state.</p>
+
+    <div class="focus-now">
+      <strong>Branch:</strong> <code>phase/3-variation-lineage</code> (off <code>master</code>) · merge via PR only · <a href="../git-workflow.html" style="color:var(--link)">Git workflow</a>
+    </div>
+
+    <div class="focus-now">
+      <strong>Agent skills:</strong> <code>productizer-p3-variation-lineage</code> + <code>productizer-git-workflow</code> + <code>productizer-phase-validate</code>
+    </div>
+
+    <section>
+      <h2>Step 0 — Branch from master</h2>
+      <pre><code>git fetch origin
+git checkout master && git pull origin master
+git checkout phase/3-variation-lineage 2>/dev/null || git checkout -b phase/3-variation-lineage
+git branch --show-current   # must print: phase/3-variation-lineage</code></pre>
+      <p style="font-size:0.9rem;color:var(--muted)">Spec-only planning may land first; run <code>./scripts/validate-p3.sh --tier docs</code> before opening the planning PR.</p>
+    </section>
+
+    <section>
+      <h2>Step 1 — Schema &amp; migration</h2>
+      <ol>
+        <li>Add <code>conceptVariations</code> table per R3.1</li>
+        <li>Add <code>approvedVariationId</code> on <code>designConcepts</code> per R3.2</li>
+        <li><code>pnpm db:generate && pnpm db:migrate</code></li>
+      </ol>
+    </section>
+
+    <section>
+      <h2>Step 2 — Variation storage layer</h2>
+      <ol>
+        <li><code>src/lib/variations/storage-paths.ts</code> — keys under <code>variations/{id}/</code></li>
+        <li><code>src/lib/variations/process-image.ts</code> — reuse sharp sizing from P2 assets</li>
+        <li><code>src/lib/variations/repository.ts</code> — CRUD, copy-from-asset, single-approved transition</li>
+        <li>Extend <code>src/lib/concepts/repository.ts</code> — return <code>approvedVariationId</code></li>
+      </ol>
+    </section>
+
+    <section>
+      <h2>Step 3 — Validation schema &amp; unit tests</h2>
+      <ol>
+        <li><code>src/lib/schemas/variation.ts</code> — status enum, PATCH body, from-asset body</li>
+        <li>Vitest: status transition / single-approved helper (R3.14)</li>
+      </ol>
+    </section>
+
+    <section>
+      <h2>Step 4 — REST API routes</h2>
+      <ol>
+        <li><code>src/app/api/concepts/[id]/variations/route.ts</code> — GET list, POST multipart</li>
+        <li><code>src/app/api/concepts/[id]/variations/from-asset/route.ts</code> — POST JSON branch from reference</li>
+        <li><code>src/app/api/concepts/[id]/variations/[variationId]/route.ts</code> — PATCH status</li>
+        <li><code>src/app/api/variations/[id]/file/route.ts</code> — GET file by variant</li>
+        <li>JSON errors <code>{ error: string }</code>; verify with curl (see <a href="validation.html" style="color:var(--link)">validation.html</a>)</li>
+      </ol>
+    </section>
+
+    <section>
+      <h2>Step 5 — Client hooks &amp; gallery UI</h2>
+      <ol>
+        <li><code>src/hooks/use-variations.ts</code> — query + mutations (R3.13)</li>
+        <li><code>src/components/variations/variation-gallery.tsx</code> — grid, approve/reject, upload, branch-from-preview (R3.9–R3.12)</li>
+        <li>Wire into <code>src/app/(studio)/concepts/[id]/page.tsx</code> below reference gallery</li>
+      </ol>
+    </section>
+
+    <section>
+      <h2>Step 6 — Studio polish</h2>
+      <ol>
+        <li>Update studio headers/badge to P3 where appropriate</li>
+        <li>Optional: variation count on <code>concept-card.tsx</code> (R3.S1)</li>
+        <li>README: document variation flow and approve semantics</li>
+      </ol>
+    </section>
+
+    <section>
+      <h2>Step 7 — Tests &amp; validation script</h2>
+      <ol>
+        <li><code>e2e/variation-lineage.spec.ts</code> — approve flow with <code>data-testid</code> (R3.15)</li>
+        <li>Finalize <code>scripts/validate-p3.sh</code> — curl create + PATCH approve</li>
+        <li><code>./scripts/validate-p3.sh</code> exit 0 before implementation PR merge</li>
+      </ol>
+    </section>
+
+    <section>
+      <h2>In-phase drop-in requests</h2>
+      <p style="font-size:0.9rem;color:var(--muted)">
+        When the user adds UX or behavior during P3, update <code>requirements.html</code> (acceptance + amendments table),
+        <code>validation.html</code>, and this plan in the same work session—before or with the code PR.
+      </p>
+    </section>
+
+    <section>
+      <h2>Risks</h2>
+      <table>
+        <thead><tr><th>Risk</th><th>Mitigation</th></tr></thead>
+        <tbody>
+          <tr><td>Duplicate storage when copying from asset</td><td>Server-side file copy; new variation id folder; do not alias asset keys</td></tr>
+          <tr><td>Race on two simultaneous approves</td><td>Transaction in repository: demote others then set concept FK</td></tr>
+          <tr><td>Framer Motion + reduced motion</td><td>Check <code>prefers-reduced-motion</code>; skip stagger variants</td></tr>
+          <tr><td>P2 regression</td><td>Keep P2 E2E in CI; validate-p3 script hits health + asset smoke</td></tr>
+        </tbody>
+      </table>
+    </section>
+  </article>
+</body>
+</html>

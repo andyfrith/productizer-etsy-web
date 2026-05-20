@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>P3 Variation Lineage — Phase Spec</title>
+  <link rel="stylesheet" href="../shared.css" />
+</head>
+<body class="wide">
+  <nav class="breadcrumb">
+    <a href="../index.html">Constitution</a> /
+    <a href="../roadmap.html">Roadmap</a> /
+    P3 Variation Lineage
+  </nav>
+  <article>
+    <header class="page-intro">
+      <p style="font-size:0.75rem;color:var(--muted);margin-bottom:0.35rem"><span class="phase-tag">P3</span> <span class="lane-tag lane-tag--now">now</span> <code>20260520-phase3-variation-lineage</code></p>
+      <h1>Phase 3 — Variation Lineage</h1>
+      <p class="lead">
+        Parent/child design variations per concept: REST CRUD under <code>/api/concepts/:id/variations</code>,
+        approve/reject workflow, <code>VariationGallery</code> with Framer Motion stagger on concept detail—ready for P4 AI generation.
+      </p>
+    </header>
+
+    <div class="doc-context">
+      <dl>
+        <dt>Branch</dt>
+        <dd><code>phase/3-variation-lineage</code> → PR → <code>master</code></dd>
+        <dt>Depends on</dt>
+        <dd><a href="../20260520-phase2-asset-upload/index.html">P2 Asset Upload</a> (merged)</dd>
+        <dt>Unlocks</dt>
+        <dd>Roadmap P4 AI provider spike</dd>
+      </dl>
+    </div>
+
+    <div class="focus-now">
+      <strong>Decisions (spec kickoff):</strong>
+      Full roadmap P3 scope · REST <code>/api/concepts/:id/variations</code> · pnpm · Node 22 ·
+      validation = automated gate (script + curl + Playwright approve flow) ·
+      Spec folder <code>20260520-phase3-variation-lineage</code>
+    </div>
+
+    <section>
+      <h2>Phase documents</h2>
+      <nav class="hub-grid">
+        <a class="hub-card" href="requirements.html">
+          <div class="hub-card-body">
+            <h3>Requirements</h3>
+            <p>Scope, acceptance criteria, out of scope, dependencies.</p>
+          </div>
+        </a>
+        <a class="hub-card" href="plan.html">
+          <div class="hub-card-body">
+            <h3>Plan</h3>
+            <p>Implementation order, file touchpoints, commands.</p>
+          </div>
+        </a>
+        <a class="hub-card" href="validation.html">
+          <div class="hub-card-body">
+            <h3>Validation</h3>
+            <p>Automated scripts + Playwright approve flow; PR-ready definition of done.</p>
+          </div>
+        </a>
+      </nav>
+    </section>
+
+    <section>
+      <h2>Upstream references</h2>
+      <ul>
+        <li><a href="../roadmap.html" style="color:var(--link)">Roadmap</a> — P3 row; depends on P1 + P2</li>
+        <li><a href="../20260520-phase2-asset-upload/index.html" style="color:var(--link)">P2 Asset Upload spec</a> — references + preview asset</li>
+        <li><a href="../tech-stack.html" style="color:var(--link)">Tech Stack</a> — <code>concept_variations</code> excerpt</li>
+        <li><a href="../mission.html" style="color:var(--link)">Mission</a> — branch and compare art directions</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>In-phase updates</h2>
+      <p style="font-size:0.9rem;color:var(--muted)">
+        Drop-in requests during P3 are recorded in <a href="requirements.html#phase-amendments" style="color:var(--link)">requirements → Phase amendments</a>
+        and reflected in validation/E2E. None yet at spec kickoff.
+      </p>
+    </section>
+
+    <section>
+      <h2>Deliverable summary</h2>
+      <pre><code>git checkout phase/3-variation-lineage   # from latest master
+docker compose up -d
+pnpm db:migrate                     # concept_variations + approved_variation_id
+pnpm dev                            # variations on /concepts/:id
+
+# REST
+GET    /api/concepts/:id/variations
+POST   /api/concepts/:id/variations              # multipart: file + optional parentVariationId
+POST   /api/concepts/:id/variations/from-asset   # JSON: { assetId, parentVariationId? }
+PATCH  /api/concepts/:id/variations/:variationId # { status: pending | approved | rejected }
+
+# UI
+VariationGallery — grid, approve/reject, branch upload, Framer Motion stagger</code></pre>
+    </section>
+  </article>
+</body>
+</html>

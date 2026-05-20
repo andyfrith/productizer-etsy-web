@@ -40,6 +40,7 @@ git checkout phase/N-slug      # existing
 | P0 Scaffold | `phase/0-scaffold` | `specs/20260519-phase0-scaffold/` |
 | P1 Concept CRUD | `phase/1-concept-crud` | `specs/20260519-phase1-concept-crud/` |
 | P2 Asset Upload | `phase/2-asset-upload` | `specs/20260520-phase2-asset-upload/` |
+| P3 Variation Lineage | `phase/3-variation-lineage` | `specs/20260520-phase3-variation-lineage/` |
 
 ## Commits
 
