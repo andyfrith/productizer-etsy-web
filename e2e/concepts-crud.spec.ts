@@ -35,7 +35,7 @@ test.describe("concept CRUD", () => {
   test("studio home links to concepts with P2 badge", async ({ page }) => {
     await page.goto("/");
 
-    await expect(page.getByText("Phase P2")).toBeVisible();
+    await expect(page.getByText("Phase P3")).toBeVisible();
     await page.getByRole("link", { name: "Concept gallery" }).click();
     await expect(page).toHaveURL("/concepts");
     await expect(page.getByRole("heading", { name: "Concepts" })).toBeVisible();

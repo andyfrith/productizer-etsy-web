@@ -36,7 +36,9 @@ REST API: `GET/POST /api/concepts`, `GET/PATCH/DELETE /api/concepts/:id` (DELETE
 
 **Asset upload (P2):** Add multiple reference images and choose a **preview** for the gallery. **Archive** hides images from Active (undo via toast); open **Archived** to permanently delete with confirmation. API: `GET /api/concepts/:id/references?archived=true|false`, `PUT …/preview`, `DELETE /api/assets/:id?conceptId=` (archive), `POST /api/assets/:id?conceptId=` (restore), `DELETE …&permanent=true` (archived only).
 
-**Database UI:** With Postgres running, `pnpm db:studio` opens Drizzle Kit Studio for inspecting and editing tables (e.g. `design_concepts`, `design_assets`).
+**Variation lineage (P3):** On concept detail, upload **variations** (art directions), optionally branch from preview or parent variation, and **approve** one winner at a time (approving another demotes the previous). API: `GET/POST /api/concepts/:id/variations`, `POST …/from-asset`, `PATCH …/:variationId`, `GET /api/variations/:id/file?variant=`.
+
+**Database UI:** With Postgres running, `pnpm db:studio` opens Drizzle Kit Studio for inspecting and editing tables (e.g. `design_concepts`, `design_assets`, `concept_variations`).
 
 ### Scripts
 
@@ -47,17 +49,17 @@ REST API: `GET/POST /api/concepts`, `GET/PATCH/DELETE /api/concepts/:id` (DELETE
 | `pnpm start` | Run production server |
 | `pnpm lint` | ESLint |
 | `pnpm test` | Vitest unit tests |
-| `pnpm test:e2e` | Playwright (studio smoke, concept CRUD, asset upload) |
+| `pnpm test:e2e` | Playwright (studio smoke, concept CRUD, asset upload, variation lineage) |
 | `pnpm db:generate` | Generate Drizzle migrations |
 | `pnpm db:migrate` | Apply migrations |
 | `pnpm db:studio` | Drizzle Kit Studio (browse/edit DB at [https://local.drizzle.studio](https://local.drizzle.studio); requires Postgres + `.env.local`) |
 
-### Validation (P2)
+### Validation (P3)
 
-On branch `phase/2-asset-upload`:
+On branch `phase/3-variation-lineage`:
 
 ```bash
-./scripts/validate-p2.sh
+./scripts/validate-p3.sh
 ```
 
-See [specs/20260520-phase2-asset-upload/validation.html](specs/20260520-phase2-asset-upload/validation.html).
+See [specs/20260520-phase3-variation-lineage/validation.html](specs/20260520-phase3-variation-lineage/validation.html).

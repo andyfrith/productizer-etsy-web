@@ -19,6 +19,7 @@ export function mapConceptRow(row: ConceptRow): ConceptDto {
     styleNotes: row.styleNotes,
     status: row.status as ConceptStatus,
     previewAssetId: row.previewAssetId,
+    approvedVariationId: row.approvedVariationId,
     createdAt: row.createdAt.toISOString(),
     updatedAt: row.updatedAt.toISOString(),
   };

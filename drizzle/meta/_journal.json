@@ -36,6 +36,13 @@
       "when": 1779292000000,
       "tag": "0004_asset_archived_at",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1779293000000,
+      "tag": "0005_concept_variations",
+      "breakpoints": true
     }
   ]
 }
