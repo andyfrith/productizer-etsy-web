@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>P4 AI Provider Spike — Phase Spec</title>
+  <link rel="stylesheet" href="../shared.css" />
+</head>
+<body class="wide">
+  <nav class="breadcrumb">
+    <a href="../index.html">Constitution</a> /
+    <a href="../roadmap.html">Roadmap</a> /
+    P4 AI Provider Spike
+  </nav>
+  <article>
+    <header class="page-intro">
+      <p style="font-size:0.75rem;color:var(--muted);margin-bottom:0.35rem"><span class="phase-tag">P4</span> <span class="lane-tag lane-tag--now">now</span> <code>20260520-phase4-ai-provider-spike</code></p>
+      <h1>Phase 4 — AI Provider Spike</h1>
+      <p class="lead">
+        TanStack AI streaming + <code>ImageGenerationProvider</code> abstraction; Nano Banana (or mock when no API key)
+        generates 1→N variations into <code>concept_variations</code> with <code>prompt_snapshot</code>—ready for P5 poster mock.
+      </p>
+    </header>
+
+    <div class="doc-context">
+      <dl>
+        <dt>Branch</dt>
+        <dd><code>phase/4-ai-provider-spike</code> → PR → <code>master</code></dd>
+        <dt>Depends on</dt>
+        <dd><a href="../20260520-phase3-variation-lineage/index.html">P3 Variation Lineage</a> (merged)</dd>
+        <dt>Unlocks</dt>
+        <dd>Roadmap P5 First mock template</dd>
+      </dl>
+    </div>
+
+    <div class="focus-now">
+      <strong>Decisions (spec kickoff):</strong>
+      Full roadmap P4 scope · REST <code>POST /api/concepts/:id/variations/generate</code> · pnpm · Node 22 ·
+      validation = automated gate (script + curl + Playwright mock-provider flow) ·
+      Spec folder <code>20260520-phase4-ai-provider-spike</code>
+    </div>
+
+    <section>
+      <h2>Phase documents</h2>
+      <nav class="hub-grid">
+        <a class="hub-card" href="requirements.html">
+          <div class="hub-card-body">
+            <h3>Requirements</h3>
+            <p>Scope, acceptance criteria, out of scope, dependencies.</p>
+          </div>
+        </a>
+        <a class="hub-card" href="plan.html">
+          <div class="hub-card-body">
+            <h3>Plan</h3>
+            <p>Implementation order, file touchpoints, commands.</p>
+          </div>
+        </a>
+        <a class="hub-card" href="validation.html">
+          <div class="hub-card-body">
+            <h3>Validation</h3>
+            <p>Automated scripts + Playwright generate flow; PR-ready definition of done.</p>
+          </div>
+        </a>
+      </nav>
+    </section>
+
+    <section>
+      <h2>Upstream references</h2>
+      <ul>
+        <li><a href="../roadmap.html" style="color:var(--link)">Roadmap</a> — P4 row; depends on P3</li>
+        <li><a href="../20260520-phase3-variation-lineage/index.html" style="color:var(--link)">P3 Variation Lineage spec</a> — gallery + <code>prompt_snapshot</code> column</li>
+        <li><a href="../tech-stack.html" style="color:var(--link)">Tech Stack</a> — TanStack AI + provider abstraction excerpt</li>
+        <li><a href="../mission.html" style="color:var(--link)">Mission</a> — AI-assisted variation generation</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>In-phase updates</h2>
+      <p style="font-size:0.9rem;color:var(--muted)">
+        Drop-in requests during P4 are recorded in <a href="requirements.html#phase-amendments" style="color:var(--link)">requirements → Phase amendments</a>
+        and reflected in validation/E2E. None yet at spec kickoff.
+      </p>
+    </section>
+
+    <section>
+      <h2>Deliverable summary</h2>
+      <pre><code>git checkout phase/4-ai-provider-spike   # from latest master
+docker compose up -d
+pnpm db:migrate                     # no new tables required for spike (optional job table deferred)
+pnpm dev                            # generate on /concepts/:id
+
+# REST
+POST /api/concepts/:id/variations/generate
+  JSON: { prompt, count?, parentVariationId?, sourceAssetId?, providerId? }
+  Response: SSE/stream or chunked JSON events (queued → generating → saved → done)
+
+# Providers
+src/lib/ai/providers/nanobanana.ts   # live when NANOBANANA_API_KEY set
+src/lib/ai/providers/mock.ts         # CI + local without key (fixture PNG)
+getImageProvider() from AI_PROVIDER env
+
+# Client
+useGenerateVariations(conceptId)   # TanStack AI + invalidate ['variations', conceptId]
+GenerateVariationsPanel on concept detail — prompt, count 1–4, progress UI</code></pre>
+    </section>
+  </article>
+</body>
+</html>

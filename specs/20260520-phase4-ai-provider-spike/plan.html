@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Plan — P4 AI Provider Spike</title>
+  <link rel="stylesheet" href="../shared.css" />
+</head>
+<body class="wide">
+  <nav class="breadcrumb">
+    <a href="../index.html">Constitution</a> /
+    <a href="index.html">P4 AI Provider Spike</a> / Plan
+  </nav>
+  <article>
+    <h1>Implementation Plan — P4 AI Provider Spike</h1>
+    <p class="lead">Ordered steps to implement requirements R4.1–R4.15. Each step should leave the repo in a runnable state.</p>
+
+    <div class="focus-now">
+      <strong>Branch:</strong> <code>phase/4-ai-provider-spike</code> (off <code>master</code>) · merge via PR only · <a href="../git-workflow.html" style="color:var(--link)">Git workflow</a>
+    </div>
+
+    <div class="focus-now">
+      <strong>Agent skills:</strong> <code>productizer-p4-ai-provider-spike</code> + <code>productizer-git-workflow</code> + <code>productizer-phase-validate</code>
+    </div>
+
+    <section>
+      <h2>Step 0 — Branch from master</h2>
+      <pre><code>git fetch origin
+git checkout master && git pull origin master
+git checkout phase/4-ai-provider-spike 2>/dev/null || git checkout -b phase/4-ai-provider-spike
+git branch --show-current   # must print: phase/4-ai-provider-spike</code></pre>
+      <p style="font-size:0.9rem;color:var(--muted)">Spec-only planning may land first; run <code>./scripts/validate-p4.sh --tier docs</code> before opening the planning PR.</p>
+    </section>
+
+    <section>
+      <h2>Step 1 — Provider layer</h2>
+      <ol>
+        <li>Extend <code>src/lib/ai/types.ts</code> per R4.1</li>
+        <li><code>src/lib/ai/providers/mock.ts</code> — fixture bytes (R4.3)</li>
+        <li><code>src/lib/ai/providers/nanobanana.ts</code> — HTTP client (R4.2)</li>
+        <li>Update <code>src/lib/ai/registry.ts</code> — env resolution + mock fallback (R4.4)</li>
+        <li>Vitest <code>tests/ai-registry.test.ts</code> (R4.12)</li>
+      </ol>
+    </section>
+
+    <section>
+      <h2>Step 2 — Generate orchestration</h2>
+      <ol>
+        <li><code>src/lib/schemas/generate-variation.ts</code> — Zod body (R4.5)</li>
+        <li><code>src/lib/ai/generate-variations.ts</code> — loop count, call provider, persist via <code>variations/repository</code>, emit progress callbacks (R4.7)</li>
+        <li>Resolve reference image from <code>sourceAssetId</code> using asset file route paths (R4.11)</li>
+      </ol>
+    </section>
+
+    <section>
+      <h2>Step 3 — Streaming REST route</h2>
+      <ol>
+        <li><code>src/app/api/concepts/[id]/variations/generate/route.ts</code> — POST, SSE events (R4.6, R4.8)</li>
+        <li>Map errors to <code>{ error }</code> for non-stream failures; stream <code>error</code> event on generation failure</li>
+        <li>Manual curl check per <a href="validation.html" style="color:var(--link)">validation.html</a></li>
+      </ol>
+    </section>
+
+    <section>
+      <h2>Step 4 — Client hook &amp; UI</h2>
+      <ol>
+        <li><code>src/hooks/use-generate-variations.ts</code> — fetch stream parser + TanStack AI where applicable (R4.9)</li>
+        <li><code>src/components/variations/generate-variations-panel.tsx</code> (R4.10)</li>
+        <li>Wire above <code>VariationGallery</code> on <code>src/app/(studio)/concepts/[id]/page.tsx</code></li>
+      </ol>
+    </section>
+
+    <section>
+      <h2>Step 5 — Docs &amp; env</h2>
+      <ol>
+        <li>README: AI generation section, mock vs live key (R4.15)</li>
+        <li>Confirm <code>.env.example</code> keys (R4.15)</li>
+        <li>Studio header/badge P4 where appropriate</li>
+      </ol>
+    </section>
+
+    <section>
+      <h2>Step 6 — Tests &amp; validation script</h2>
+      <ol>
+        <li><code>e2e/variation-generate.spec.ts</code> — mock provider, count=2 (R4.13)</li>
+        <li>Finalize <code>scripts/validate-p4.sh</code> — curl stream smoke with mock</li>
+        <li><code>./scripts/validate-p4.sh</code> exit 0 before implementation PR merge</li>
+      </ol>
+    </section>
+
+    <section>
+      <h2>In-phase drop-in requests</h2>
+      <p style="font-size:0.9rem;color:var(--muted)">
+        When the user adds UX or behavior during P4, update <code>requirements.html</code> (acceptance + amendments table),
+        <code>validation.html</code>, and this plan in the same work session—before or with the code PR.
+      </p>
+    </section>
+
+    <section>
+      <h2>Risks</h2>
+      <table>
+        <thead><tr><th>Risk</th><th>Mitigation</th></tr></thead>
+        <tbody>
+          <tr><td>Nano Banana API shape unknown / changes</td><td>Isolate HTTP in <code>nanobanana.ts</code>; document request/response; mock provider for CI</td></tr>
+          <tr><td>TanStack AI API drift vs P0 pin</td><td>Pin <code>@tanstack/ai</code>; fallback to fetch + ReadableStream if hook API differs</td></tr>
+          <tr><td>Long-running generate blocks server</td><td>Acceptable for local spike; cap <code>count</code> at 4; note Redis queue in P6+ tech-stack</td></tr>
+          <tr><td>Stream disconnect mid-job</td><td>Variations already saved emit <code>saved</code>; client invalidates on partial done</td></tr>
+          <tr><td>P3 regression</td><td>validate-p4 runs P3 curl smoke + variation-lineage E2E</td></tr>
+        </tbody>
+      </table>
+    </section>
+  </article>
+</body>
+</html>
